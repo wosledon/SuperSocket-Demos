@@ -13,7 +13,7 @@ namespace Chat.Server
 {
     class Program
     {
-        static List<IAppSession> _sessions = new List<IAppSession>();
+        private static List<IAppSession> _sessions = new List<IAppSession>();
         private static int _msgCount = 0; // 消息序号
         private static int _tcpCount = 0;
         private static int _udpCount = 0;
@@ -29,6 +29,7 @@ namespace Chat.Server
                             Port = 4041
                         });
                 })
+                .UseSession<MySession>()
                 .UseSessionHandler(onConnected: (s) =>
                 {
                     _sessions.Add(s);
@@ -37,12 +38,15 @@ namespace Chat.Server
                     return default;
                 }, onClosed: (s, e) =>
                 {
-                    foreach (var session in _sessions)
+                    if (_sessions != null)
                     {
-                        if (session.SessionID.Equals(s.SessionID))
+                        foreach (var session in _sessions)
                         {
-                            _sessions.Remove(session);
-                            break;
+                            if (session.SessionID.Equals(s.SessionID))
+                            {
+                                _sessions.Remove(session);
+                                break;
+                            }
                         }
                     }
                     Console.WriteLine($"\n[{++_msgCount}] [TCP] 客户端下线:" + _sessions.Count + Environment.NewLine);
