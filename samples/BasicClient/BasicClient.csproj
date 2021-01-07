@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/SuperSocket.Client/SuperSocket.Client.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="SuperSocket.ProtoBase">
+      <HintPath>..\..\src\SuperSocket.ProtoBase\bin\Debug\netstandard2.1\SuperSocket.ProtoBase.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

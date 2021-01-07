@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SuperSocket.Channel\SuperSocket.Channel.csproj" />
+    <ProjectReference Include="..\..\src\SuperSocket.Client.Proxy\SuperSocket.Client.Proxy.csproj" />
+    <ProjectReference Include="..\..\src\SuperSocket.Client\SuperSocket.Client.csproj" />
+    <ProjectReference Include="..\..\src\SuperSocket.Command\SuperSocket.Command.csproj" />
+    <ProjectReference Include="..\..\src\SuperSocket.Http\SuperSocket.Http.csproj" />
+    <ProjectReference Include="..\..\src\SuperSocket.Primitives\SuperSocket.Primitives.csproj" />
+    <ProjectReference Include="..\..\src\SuperSocket.ProtoBase\SuperSocket.ProtoBase.csproj" />
+    <ProjectReference Include="..\..\src\SuperSocket.Server\SuperSocket.Server.csproj" />
+    <ProjectReference Include="..\..\src\SuperSocket.SessionContainer\SuperSocket.SessionContainer.csproj" />
+    <ProjectReference Include="..\..\src\SuperSocket.Udp\SuperSocket.Udp.csproj" />
+    <ProjectReference Include="..\..\src\SuperSocket.WebSocket.Server\SuperSocket.WebSocket.Server.csproj" />
+    <ProjectReference Include="..\..\src\SuperSocket.WebSocket\SuperSocket.WebSocket.csproj" />
+    <ProjectReference Include="..\..\test\SuperSocket.Benchmarks\SuperSocket.Benchmarks.csproj" />
+    <ProjectReference Include="..\..\test\SuperSocket.Tests.Command\SuperSocket.Tests.Command.csproj" />
+    <ProjectReference Include="..\..\test\SuperSocket.Tests\SuperSocket.Tests.csproj" />
+    <ProjectReference Include="..\Chat.Models\Chat.Models.csproj" />
+  </ItemGroup>
+
+</Project>

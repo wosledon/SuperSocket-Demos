@@ -1,0 +1,14 @@
+﻿<UserControl x:Class="Chat.Client.MessageControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Chat.Client"
+             mc:Ignorable="d" Height="113" Width="407">
+    <Grid>
+        <Label x:Name="LabChatName" Foreground="Green" Content="[ 张三 ]" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+        <Label Content="说:" HorizontalAlignment="Left" Margin="55,10,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="LabChatContext" Content="Hello World" HorizontalAlignment="Left" Margin="35,35,0,0" VerticalAlignment="Top" Width="358" Height="68"/>
+
+    </Grid>
+</UserControl>
