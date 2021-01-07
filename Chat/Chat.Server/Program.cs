@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using SuperSocket.Server;
+using SuperSocket.SessionContainer;
 
 namespace Chat.Server
 {
@@ -84,7 +85,11 @@ namespace Chat.Server
                     Console.WriteLine($"\n[{++_msgCount}] [TCP] Error信息:" + s.SessionID.ToString() + Environment.NewLine);
                     return default;
                 })
+                .UseMiddleware<InProcSessionContainerMiddleware>()
+                .UseInProcSessionContainer()
                 .BuildAsServer();
+            var container = host.GetSessionContainer();
+            var sessions = container.GetSessions();
 
             //var sessionContainer = host.GetSessionContainer();
             //Console.WriteLine(sessionContainer?.GetSessionCount());
