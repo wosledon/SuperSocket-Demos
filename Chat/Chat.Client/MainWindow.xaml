@@ -9,7 +9,11 @@
         ResizeMode="CanMinimize"
         WindowStartupLocation="CenterScreen">
     <Grid HorizontalAlignment="Left" Width="812" Margin="10,0,0,3">
-        <TextBox x:Name="TbChatArea" AcceptsReturn="True" VerticalScrollBarVisibility="Visible" HorizontalAlignment="Left" Margin="145,35,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="645" Height="274"/>
+        <GroupBox Margin="145,35,22,142">
+            <StackPanel x:Name="SpChatArea" Orientation="Vertical" Height="200">
+                
+            </StackPanel>
+        </GroupBox>
         <TextBox x:Name="TbSendArea" AcceptsReturn="True" VerticalScrollBarVisibility="Visible" HorizontalAlignment="Left" Margin="145,328,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="645" Height="73"/>
         <ListView x:Name="LvOnlineList" Margin="0,10,682,28">
             <ListView.View>
@@ -21,6 +25,7 @@
         <Button x:Name="BtnSend" Click="BtnSend_OnClick" Content="发送" HorizontalAlignment="Left" Margin="713,406,0,0" VerticalAlignment="Top" Width="77"/>
         <Label Content="当前会话:" HorizontalAlignment="Left" Margin="145,5,0,0" VerticalAlignment="Top" Width="68"/>
         <Label Foreground="Blue" Content="Default" HorizontalAlignment="Left" Margin="203,5,0,0" VerticalAlignment="Top" Width="218"/>
+        <TextBox x:Name="TbUserName" HorizontalAlignment="Left" Margin="670,10,0,0" Text="Default" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
 
     </Grid>
 </Window>

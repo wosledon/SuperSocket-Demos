@@ -16,12 +16,12 @@ namespace Chat.Client
     public partial class MessageControl : UserControl
     {
 
-        public MessageControl(TextMessageModel Message)
+        public MessageControl(TextMessageModel message)
         {
             InitializeComponent();
 
-            LabChatName.Content = Message.Name;
-            LabChatContext.Content = Message.TextMessage;
+            LabChatName.Content = $"[ {message.Name} ]";
+            LabChatContext.Content = message.TextMessage;
         }
 
         public static System.Drawing.Image BytesToImage(byte[] buffer)

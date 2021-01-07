@@ -6,7 +6,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using Chat.Models;
 using Microsoft.Extensions.Logging.Abstractions;
+using Newtonsoft.Json;
 using SuperSocket.Channel;
 using SuperSocket.Client;
 using SuperSocket.ProtoBase;
@@ -53,14 +55,32 @@ namespace Chat.Client
             {
                 var package = await _client.ReceiveAsync();
                 Assert.NotNull(package);
-                if(package != null) TbChatArea.Text += "Receive:" + package.Text + Environment.NewLine;
+                //if(package != null) SpChatArea.Text += "Receive:" + package.Text + Environment.NewLine;
+                var data = JsonConvert.DeserializeObject<TextMessageModel>(package.Text);
+                if (package != null)
+                {
+                    SpChatArea.Children.Add(new MessageControl(new TextMessageModel()
+                    {
+                        Name = data.Name,
+                        TextMessage = data.TextMessage
+                    }));
+                }
                 await Task.Delay(500);
             }
         }
 
         private async Task Send(string message)
         {
-            await _client.SendAsync(Encoding.UTF8.GetBytes(message + "\r\n"));
+            //await _client.SendAsync(Encoding.UTF8.GetBytes(message + "\r\n"));
+            var data = new TextMessageModel
+            {
+                Name = TbUserName.Text,
+                TextMessage = message
+            };
+            // 向ChatArea中添加组件
+            SpChatArea.Children.Add(new SendControl(data));
+
+            await _client.SendAsync(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(data) + "\r\n"));
         }
 
         private void BtnSend_OnClick(object sender, RoutedEventArgs e)
