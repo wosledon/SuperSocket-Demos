@@ -46,7 +46,7 @@ namespace Chat.Client
 
             _client = new EasyClient<TextPackageInfo>(new LinePipelineFilter(), options).AsClient();
 
-            var connected = await _client.ConnectAsync(new IPEndPoint(/*IPAddress.Loopback*/IPAddress.Parse("111.230.69.90"), 8888));
+            var connected = await _client.ConnectAsync(new IPEndPoint(IPAddress.Loopback, 8888));
 
             var connectPackage = new MessagePackage<TextMessageModel>()
             {
