@@ -10,21 +10,24 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Chat.Models;
 
 namespace Chat.Client
 {
     /// <summary>
-    /// ReceiveControl.xaml 的交互逻辑
+    /// UserItemsControl.xaml 的交互逻辑
     /// </summary>
-    public partial class SendControl : UserControl
+    public partial class UserItemsControl : UserControl
     {
-        public SendControl(TextMessageModel message)
+        public UserItemsControl(string username)
         {
             InitializeComponent();
 
-            //LabChatName.Content = $"[ {message.LocalName} ]";
-            LabChatContext.Content = message.TextMessage;
+            TbUserName.Text = username;
+        }
+
+        private void UserItemsControl_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            
         }
     }
 }

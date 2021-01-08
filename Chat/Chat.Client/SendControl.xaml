@@ -6,14 +6,22 @@
              xmlns:local="clr-namespace:Chat.Client"
              mc:Ignorable="d" Height="auto" Width="640">
     <Grid>
-        <Label x:Name="LabChatName" Foreground="Green" Content="[ 张三 ]" HorizontalAlignment="Left" Margin="491,10,0,0" VerticalAlignment="Top"/>
-        <Label Content="说:" HorizontalAlignment="Left" Margin="594,10,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="LabChatContext" HorizontalAlignment="Left" Margin="344,35,0,20" VerticalAlignment="Top" Width="250" Height="auto" Background="Azure">
-            <TextBlock TextWrapping="Wrap" Text="Hello World">
-                <Border BorderBrush="{DynamicResource {x:Static SystemColors.MenuBrushKey}}" BorderThickness="1,1,1,1"/>
-            </TextBlock>
-        </Label>
-        <Label Content="[我]" HorizontalAlignment="Left" Margin="559,10,0,0" VerticalAlignment="Top"/>
-
+        
+        <!--<WrapPanel HorizontalAlignment="Right" Margin="0,40,50,10">
+            <Label x:Name="LabChatContext" HorizontalAlignment="Left" VerticalAlignment="Top" MaxHeight="250" Width="auto" Height="auto" Background="Azure">
+                <TextBlock TextWrapping="Wrap" Text="Hello World">
+                    <Border BorderBrush="{DynamicResource {x:Static SystemColors.MenuBrushKey}}" BorderThickness="1,1,1,1"/>
+                </TextBlock>
+            </Label>
+        </WrapPanel>-->
+        <WrapPanel HorizontalAlignment="Right">
+            <Label Content="[我]" Foreground="Chocolate"  HorizontalAlignment="Left" Margin="0,10,0,0" VerticalAlignment="Top"/>
+            <Label Content="说:" HorizontalAlignment="Left" Margin="0,10,20,0" VerticalAlignment="Top"/>
+        </WrapPanel>
+        <WrapPanel HorizontalAlignment="Right" Margin="0, 40,40,10" >
+            <Label x:Name="LabChatContext" HorizontalAlignment="Left"  Background="Aquamarine"  VerticalAlignment="Top" MaxWidth="250" Width="auto" Height="auto">
+                <TextBlock TextWrapping="Wrap" Text="Hello World" />
+            </Label>
+        </WrapPanel>
     </Grid>
 </UserControl>

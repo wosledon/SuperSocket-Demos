@@ -6,11 +6,14 @@
              xmlns:local="clr-namespace:Chat.Client"
              mc:Ignorable="d" Height="auto" Width="640">
     <Grid>
-        <Label x:Name="LabChatName" Foreground="Green" Content="[ 张三 ]" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-        <Label Content="说:" HorizontalAlignment="Left" Margin="83,10,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="LabChatContext" HorizontalAlignment="Left" Margin="59,35,0,20"  Background="DarkSeaGreen" VerticalAlignment="Top" Width="250" Height="auto">
-            <TextBlock TextWrapping="Wrap" Text="Hello World" />
-        </Label>
-
+        <WrapPanel>
+            <Label x:Name="LabChatName" Foreground="Green" Content="[ 张三 ]" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+            <Label Content="说:" HorizontalAlignment="Left" Margin="0,10,0,10" VerticalAlignment="Top"/>
+        </WrapPanel>
+        <WrapPanel HorizontalAlignment="Left" Margin="35, 40,20,10">
+            <Label x:Name="LabChatContext" HorizontalAlignment="Right"  Background="AliceBlue"  VerticalAlignment="Top" MaxWidth="250" Width="auto" Height="auto">
+                <TextBlock TextWrapping="Wrap" Text="Hello World" />
+            </Label>
+        </WrapPanel>
     </Grid>
 </UserControl>

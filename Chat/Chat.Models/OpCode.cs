@@ -6,8 +6,10 @@ namespace Chat.Models
 {
     public enum OpCode
     {
-        Connecting = 0,
-        Single = 1,
-        All = 2
+        Connect = 1,
+        DisConnect = 2,
+        Subscribe = 3,
+        Single = 4,
+        All = 5
     }
 }

@@ -3,10 +3,15 @@ using SuperSocket;
 using SuperSocket.ProtoBase;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Chat.Models;
+using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using SuperSocket.Channel;
 using SuperSocket.Server;
 using SuperSocket.SessionContainer;
 
@@ -14,10 +19,13 @@ namespace Chat.Server
 {
     class Program
     {
-        private static List<IAppSession> _sessions = new List<IAppSession>();
-        private static int _msgCount = 0; // 消息序号
+        //private static List<IAppSession> _sessions = new List<IAppSession>();
+        //private static int _msgCount = 0; // 消息序号
+        private static IEnumerable<ClientInfo> _clients = new List<ClientInfo>();
         private static int _tcpCount = 0;
         private static int _udpCount = 0;
+
+        private static ISessionContainer _sessionContainer;
 
         static async Task Main(string[] args)
         {
@@ -31,76 +39,150 @@ namespace Chat.Server
                         });
                 })
                 .UseSession<MySession>()
-                .UseSessionHandler(onConnected: (s) =>
+                .UseSessionHandler(onConnected:async (s) =>
                 {
-                    _sessions.Add(s);
-                    Console.WriteLine($"\n[{++_msgCount}] [TCP] 客户端上线:" + _sessions.Count + Environment.NewLine);
-                    _tcpCount++;
-                    return default;
-                }, onClosed: (s, e) =>
-                {
-                    if (_sessions != null)
+                    Console.WriteLine($"\n[{DateTime.Now}] [TCP] 客户端上线:" + ++_tcpCount + Environment.NewLine);
+
+                    var data = new MessagePackage<TextMessageModel>()
                     {
-                        foreach (var session in _sessions)
+                        OpCode = OpCode.Connect,
+                        MessageType = MessageType.TextMessage,
+                        Message = new TextMessageModel()
                         {
-                            if (session.SessionID.Equals(s.SessionID))
-                            {
-                                _sessions.Remove(session);
-                                break;
-                            }
-                        }
+                            LocalName = "Server",
+                            RemoteName = "All"
+                        },
+                        Clients = _clients
+                    };
+                    var sessions = _sessionContainer.GetSessions().Where(x => x.SessionID != s.SessionID);
+
+                    foreach (var session in sessions)
+                    {
+                        string da = data.ToString();
+                        await session.SendAsync(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(da)));
                     }
-                    Console.WriteLine($"\n[{++_msgCount}] [TCP] 客户端下线:" + _sessions.Count + Environment.NewLine);
-                    _tcpCount--;
-                    return default;
+                }, onClosed: async (s, e) =>
+                {
+                    _clients = _clients.Where(x => x.SessionId != s.SessionID);
+
+                    var sessions = _sessionContainer.GetSessions().Where(x => x.SessionID != s.SessionID);
+                    var data = new MessagePackage<TextMessageModel>()
+                    {
+                        OpCode = OpCode.Connect,
+                        MessageType = MessageType.TextMessage,
+                        Message = new TextMessageModel()
+                        {
+                            LocalName = "Server",
+                            TextMessage = "Connect Success."
+                        },
+                        Clients = _clients
+                    };
+                    foreach (var session in sessions)
+                    {
+                        string val = data.ToString();
+                        await session.SendAsync(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(val)));
+                    }
+
+                    Console.WriteLine($"\n[{DateTime.Now}] [TCP] 客户端下线:" + --_tcpCount + Environment.NewLine);
                 })
-                //.UseSessionHandler(onClosed: (s,e) =>
-                //{
-                //    foreach (var session in sessions)
-                //    {
-                //        if (session.SessionID.Equals(s.SessionID))
-                //        {
-                //            sessions.Remove(session);
-                //            break;
-                //        }
-                //    }
-                //    return default;
-                //})
                 .UsePackageHandler(async (s, p) =>
                 {
-                    Console.WriteLine($"\n[{++_msgCount}] [TCP] 服务器信息:" + p.Text + Environment.NewLine);
-                    if (_sessions.Count != 0)
+                    Console.WriteLine($"\n[{DateTime.Now}] [TCP] 服务器信息:" + p.Text + Environment.NewLine);
+
+                    // Connect
+                    var package = JsonConvert.DeserializeObject<MessagePackage<TextMessageModel>>(p.Text);
+                    
+                    switch (package.OpCode)
                     {
-                        foreach (var session in _sessions)
-                        {
-                            if (session.SessionID != s.SessionID)
+                        case OpCode.Connect:
+                            _clients = _clients.Concat(new[]
                             {
-                                await session.SendAsync(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(p.Text + "\r\n")));
+                                new ClientInfo()
+                                {
+                                    Username = package.Message.LocalName,
+                                    SessionId = s.SessionID
+                                }
+                            });
+                            var sessions = _sessionContainer.GetSessions();
+                            foreach (var session in sessions)
+                            {
+                                var connectData = new MessagePackage<TextMessageModel>()
+                                {
+                                    OpCode = OpCode.Connect,
+                                    MessageType = MessageType.TextMessage,
+                                    Message = new TextMessageModel()
+                                    {
+                                        LocalName = "Server",
+                                        RemoteName = _clients.Where(x=>s.SessionID == x.SessionId)?.FirstOrDefault().Username,
+                                        TextMessage = "Connect Success."
+                                    },
+                                    Clients = _clients.Where(x => x.SessionId != session.SessionID)
+                                };
+                                string conn = connectData.ToString();
+                                await session.SendAsync(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(conn)));
                             }
-                        }
+                            break;
+                        case OpCode.All:
+                            var allData = new MessagePackage<TextMessageModel>()
+                            {
+                                OpCode = OpCode.All,
+                                MessageType = MessageType.TextMessage,
+                                Message = new TextMessageModel()
+                                {
+                                    LocalName = package.Message.LocalName,
+                                    RemoteName = "All",
+                                    TextMessage = package.Message.TextMessage
+                                }
+                            };
+                            var asessionClients = _sessionContainer.GetSessions().Where(x=>x.SessionID!=s.SessionID);
+                            foreach (var sClient in asessionClients)
+                            {
+                                string val = allData.ToString();
+                                await sClient.SendAsync(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(val)));
+                            }
+                            break;
+                        case OpCode.Single:
+                            var singleData = new MessagePackage<TextMessageModel>()
+                            {
+                                OpCode = OpCode.Single,
+                                MessageType = MessageType.TextMessage,
+                                Message = new TextMessageModel()
+                                {
+                                    LocalName = package.Message.LocalName,
+                                    RemoteName = package.Message.RemoteName,
+                                    TextMessage = package.Message.TextMessage
+                                }
+                            };
+                            var remoteSession = _clients.Where(y => y.Username == package.Message.RemoteName);
+                            foreach (var rSession in remoteSession)
+                            {
+                                var ssessionClients = _sessionContainer.GetSessions()
+                                    .Where(x => x.SessionID.Equals(rSession.SessionId));
+                                foreach (var sClient in ssessionClients)
+                                {
+                                    var sing = singleData.ToString();
+                                    await sClient.SendAsync(
+                                        new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(sing)));
+                                }
+                            }
+                            break;
+                        case OpCode.Subscribe:
+                            default:
+                            throw new ArgumentException(message:"op code error");
                     }
+
                 })
                 .ConfigureErrorHandler((s, v) =>
                 {
-                    Console.WriteLine($"\n[{++_msgCount}] [TCP] Error信息:" + s.SessionID.ToString() + Environment.NewLine);
+                    Console.WriteLine($"\n[{DateTime.Now}] [TCP] Error信息:" + s.SessionID.ToString() + Environment.NewLine);
                     return default;
                 })
                 .UseMiddleware<InProcSessionContainerMiddleware>()
                 .UseInProcSessionContainer()
                 .BuildAsServer();
-            var container = host.GetSessionContainer();
-            var sessions = container.GetSessions();
 
-            //var sessionContainer = host.GetSessionContainer();
-            //Console.WriteLine(sessionContainer?.GetSessionCount());
-            //if (sessionContainer != null)
-            //{
-            //    var sessions = sessionContainer.GetSessions();
-            //    foreach (var appSession in sessions)
-            //    {
-            //        Console.WriteLine(appSession.ToString());
-            //    }
-            //}
+            _sessionContainer = host.GetSessionContainer();
+
 
             var hostUdp = SuperSocketHostBuilder.Create<TextPackageInfo, LinePipelineFilter>(args)
                 .ConfigureSuperSocket(options =>
@@ -111,28 +193,20 @@ namespace Chat.Server
                         Port = 4042
                     });
                 })
-                .UsePackageHandler(async (s, p) =>
+                .UsePackageHandler( (s, p) =>
                 {
-                    Console.WriteLine($"\n[{++_msgCount}] [UDP] 服务器信息:" + p.Text + Environment.NewLine);
+                    Console.WriteLine($"\n[{DateTime.Now}] [UDP] 服务器信息:" + p.Text + Environment.NewLine);
+                    return default;
                 })
                 .UseSessionHandler(onConnected: (s) =>
                 {
-                    _sessions.Add(s);
-                    Console.WriteLine($"\n[{++_msgCount}] [UDP] 客户端上线:" + _sessions.Count + Environment.NewLine);
-                    _udpCount++;
+                    Console.WriteLine($"\n[{DateTime.Now}] [UDP] 客户端上线:" + ++_udpCount + Environment.NewLine);
+
                     return default;
                 }, onClosed: (s, e) =>
                 {
-                    foreach (var session in _sessions)
-                    {
-                        if (session.SessionID.Equals(s.SessionID))
-                        {
-                            _sessions.Remove(session);
-                            break;
-                        }
-                    }
-                    Console.WriteLine($"\n[{++_msgCount}] [UDP] 客户端下线:" + _sessions.Count + Environment.NewLine);
-                    _udpCount--;
+                    Console.WriteLine($"\n[{DateTime.Now}] [UDP] 客户端下线:" + --_udpCount + Environment.NewLine);
+
                     return default;
                 })
                 .UseUdp()
@@ -143,7 +217,7 @@ namespace Chat.Server
             await hostUdp.StartAsync();
 
 #pragma warning disable 4014
-            Thread th = new Thread(() => Send());
+            Thread th = new Thread(() => Send(host));
 #pragma warning restore 4014
             th.Start();
 
@@ -156,11 +230,10 @@ namespace Chat.Server
 
         }
 
-        static async Task Send()
+        static async Task Send(IServer host)
         {
             while (true) 
             {
-                Console.WriteLine($"\n[{++_msgCount}] 客户端存活:{_sessions.Count} [TCP]:{_tcpCount}  [UDP]:{_udpCount}" + Environment.NewLine);
                 //if (sessions.Count != 0)
                 //{
                 //    foreach (var session in sessions)
@@ -168,6 +241,23 @@ namespace Chat.Server
                 //        await session.SendAsync(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes("Send Form Server" + "\r\n")));
                 //    }
                 //}
+                var data = JsonConvert.SerializeObject(new TextMessageModel
+                {
+                    LocalName = "Server",
+                    TextMessage = "Test Message"
+                });
+                //var container = host.GetSessionContainer();
+                var sessions = _sessionContainer.GetSessions();
+                if(sessions.Count() > 0)
+                {
+                    foreach (var session in sessions)
+                    {
+                        await session.SendAsync(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(data + "\r\n")));
+                    }
+                }
+
+                Console.WriteLine($"\n[{DateTime.Now}] 客户端存活:{/*_sessions.Count*/sessions.Count()} [TCP]:{_tcpCount}  [UDP]:{_udpCount}" + Environment.NewLine);
+                Console.WriteLine($"\n[{DateTime.Now}] " + JsonConvert.SerializeObject(_clients) + Environment.NewLine);
 
                 Thread.Sleep(3000);
             }

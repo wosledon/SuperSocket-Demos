@@ -27,6 +27,7 @@
     <ProjectReference Include="..\..\test\SuperSocket.Benchmarks\SuperSocket.Benchmarks.csproj" />
     <ProjectReference Include="..\..\test\SuperSocket.Tests.Command\SuperSocket.Tests.Command.csproj" />
     <ProjectReference Include="..\..\test\SuperSocket.Tests\SuperSocket.Tests.csproj" />
+    <ProjectReference Include="..\Chat.Models\Chat.Models.csproj" />
   </ItemGroup>
 
 </Project>

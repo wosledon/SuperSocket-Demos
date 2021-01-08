@@ -20,7 +20,7 @@ namespace Chat.Client
         {
             InitializeComponent();
 
-            LabChatName.Content = $"[ {message.Name} ]";
+            LabChatName.Content = $"[ {message.LocalName} ]";
             LabChatContext.Content = message.TextMessage;
         }
 
