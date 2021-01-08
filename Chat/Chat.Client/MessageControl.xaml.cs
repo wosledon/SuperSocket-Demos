@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Text;
-using System.Windows;
+﻿using Chat.Models;
 using System.Windows.Controls;
-using System.Windows.Media;
-using Chat.Models;
 
 namespace Chat.Client
 {
@@ -21,14 +14,15 @@ namespace Chat.Client
             InitializeComponent();
 
             LabChatName.Content = $"[ {message.LocalName} ]";
-            LabChatContext.Content = message.TextMessage;
+            //LabChatContext.Content = message.TextMessage;
+            TbChatContext.Text = message.TextMessage;
         }
 
-        public static System.Drawing.Image BytesToImage(byte[] buffer)
-        {
-            MemoryStream ms = new MemoryStream(buffer);
-            System.Drawing.Image image = System.Drawing.Image.FromStream(ms);
-            return image;
-        }
+        //public static System.Drawing.Image BytesToImage(byte[] buffer)
+        //{
+        //    MemoryStream ms = new MemoryStream(buffer);
+        //    System.Drawing.Image image = System.Drawing.Image.FromStream(ms);
+        //    return image;
+        //}
     }
 }

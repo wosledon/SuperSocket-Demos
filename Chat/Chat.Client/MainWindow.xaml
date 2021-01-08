@@ -19,9 +19,10 @@
 
         </GroupBox>
         <TextBox x:Name="TbSendArea" VerticalScrollBarVisibility="Visible" HorizontalAlignment="Left" Margin="145,340,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="645" Height="73"/>
-        <WrapPanel x:Name="LvOnlineList" Margin="0,10,682,28">
+        <StackPanel x:Name="LvOnlineList" Margin="0,10,682,28" 
+                    CanVerticallyScroll="True" VerticalAlignment="Top">
             
-        </WrapPanel>
+        </StackPanel>
         <Button x:Name="BtnSend" Click="BtnSend_OnClick" IsDefault="True" Content="发送" HorizontalAlignment="Left" Margin="710,316,0,0" VerticalAlignment="Top" Width="77"/>
         <Label Content="当前会话:" HorizontalAlignment="Left" Margin="145,5,0,0" VerticalAlignment="Top" Width="68"/>
         <Label x:Name="LbCurrentChat" Foreground="Blue" Content="All" HorizontalAlignment="Left" Margin="203,5,0,0" VerticalAlignment="Top" Width="218"/>

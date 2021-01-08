@@ -1,19 +1,15 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Chat.Models;
+using Newtonsoft.Json;
 using SuperSocket;
 using SuperSocket.ProtoBase;
+using SuperSocket.SessionContainer;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Chat.Models;
-using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using SuperSocket.Channel;
-using SuperSocket.Server;
-using SuperSocket.SessionContainer;
 
 namespace Chat.Server
 {
@@ -36,6 +32,11 @@ namespace Chat.Server
                         {
                             Ip = "Any",
                             Port = 4041
+                        })
+                        .AddListener(new ListenOptions()
+                        {
+                            Ip = "Any",
+                            Port = 8888
                         });
                 })
                 .UseSession<MySession>()
@@ -75,7 +76,7 @@ namespace Chat.Server
                             LocalName = "Server",
                             TextMessage = "Connect Success."
                         },
-                        Clients = _clients
+                        Clients = _clients.Count() == 1?null:_clients
                     };
                     foreach (var session in sessions)
                     {
@@ -180,7 +181,7 @@ namespace Chat.Server
                 .UseMiddleware<InProcSessionContainerMiddleware>()
                 .UseInProcSessionContainer()
                 .BuildAsServer();
-
+            
             _sessionContainer = host.GetSessionContainer();
 
 
@@ -258,7 +259,8 @@ namespace Chat.Server
 
                 Console.WriteLine($"\n[{DateTime.Now}] 客户端存活:{/*_sessions.Count*/sessions.Count()} [TCP]:{_tcpCount}  [UDP]:{_udpCount}" + Environment.NewLine);
                 Console.WriteLine($"\n[{DateTime.Now}] " + JsonConvert.SerializeObject(_clients) + Environment.NewLine);
-
+                var currentProcess = Process.GetCurrentProcess();
+                Console.WriteLine($"\n[{DateTime.Now}] RAM:{currentProcess.PrivateMemorySize64 / 1024 / 1024}/MB" + Environment.NewLine);
                 Thread.Sleep(3000);
             }
         }

@@ -10,10 +10,11 @@
             <Label x:Name="LabChatName" Foreground="Green" Content="[ 张三 ]" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
             <Label Content="说:" HorizontalAlignment="Left" Margin="0,10,0,10" VerticalAlignment="Top"/>
         </WrapPanel>
-        <WrapPanel HorizontalAlignment="Left" Margin="35, 40,20,10">
-            <Label x:Name="LabChatContext" HorizontalAlignment="Right"  Background="AliceBlue"  VerticalAlignment="Top" MaxWidth="250" Width="auto" Height="auto">
-                <TextBlock TextWrapping="Wrap" Text="Hello World" />
-            </Label>
+        <WrapPanel HorizontalAlignment="Left" Margin="35, 40,20,10" Width="auto" Height="auto">
+            <TextBlock x:Name="TbChatContext" Text="Hello World" TextWrapping="Wrap" Padding="10"
+                       HorizontalAlignment="Right"  Background="AliceBlue"  VerticalAlignment="Top" MaxWidth="250" Height="auto">
+                <!--<TextBlock x:Name="TbChatContext" TextWrapping="Wrap" Text="Hello World" MaxWidth="250" Height="auto"/>-->
+            </TextBlock>
         </WrapPanel>
     </Grid>
 </UserControl>

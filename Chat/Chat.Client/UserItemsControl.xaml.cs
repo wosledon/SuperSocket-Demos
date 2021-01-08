@@ -1,15 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
+﻿using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Chat.Client
 {
@@ -18,6 +8,10 @@ namespace Chat.Client
     /// </summary>
     public partial class UserItemsControl : UserControl
     {
+        public delegate void SetRoteName(string name);
+
+        public SetRoteName setRoteName;
+
         public UserItemsControl(string username)
         {
             InitializeComponent();
@@ -27,7 +21,7 @@ namespace Chat.Client
 
         private void UserItemsControl_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            
+            setRoteName(TbUserName.Text);
         }
     }
 }

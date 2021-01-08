@@ -16,12 +16,11 @@
         </WrapPanel>-->
         <WrapPanel HorizontalAlignment="Right">
             <Label Content="[我]" Foreground="Chocolate"  HorizontalAlignment="Left" Margin="0,10,0,0" VerticalAlignment="Top"/>
-            <Label Content="说:" HorizontalAlignment="Left" Margin="0,10,20,0" VerticalAlignment="Top"/>
+            <Label Content="说:" HorizontalAlignment="Left" Margin="0,10,30,0" VerticalAlignment="Top"/>
         </WrapPanel>
-        <WrapPanel HorizontalAlignment="Right" Margin="0, 40,40,10" >
-            <Label x:Name="LabChatContext" HorizontalAlignment="Left"  Background="Aquamarine"  VerticalAlignment="Top" MaxWidth="250" Width="auto" Height="auto">
-                <TextBlock TextWrapping="Wrap" Text="Hello World" />
-            </Label>
+        <WrapPanel HorizontalAlignment="Right" Margin="0, 40,45,10" Width="auto" Height="auto">
+            <TextBlock x:Name="TbChatContext" Text="Hello World" TextWrapping="Wrap" Padding="10"
+                       HorizontalAlignment="Left"  Background="Aquamarine"  VerticalAlignment="Top" MaxWidth="250" Height="auto" />
         </WrapPanel>
     </Grid>
 </UserControl>

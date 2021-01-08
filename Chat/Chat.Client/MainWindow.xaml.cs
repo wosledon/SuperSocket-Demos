@@ -1,23 +1,17 @@
-﻿using System;
-using System.IO;
-using System.Linq.Expressions;
+﻿using Chat.Models;
+using Microsoft.Extensions.Logging.Abstractions;
+using Newtonsoft.Json;
+using SuperSocket.Channel;
+using SuperSocket.Client;
+using SuperSocket.ProtoBase;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media;
-using Chat.Models;
-using Microsoft.Extensions.Logging.Abstractions;
-using Newtonsoft.Json;
-using SuperSocket;
-using SuperSocket.Channel;
-using SuperSocket.Client;
-using SuperSocket.ProtoBase;
-using SuperSocket.Tests;
-using Xunit;
 
 
 namespace Chat.Client
@@ -29,12 +23,17 @@ namespace Chat.Client
     {
         public Thread Receive = null;
         private IEasyClient<TextPackageInfo> _client = null;
-        public string RemoteName = "All";
+        //public string RemoteName = "All";
 
         public MainWindow()
         {
             InitializeComponent();
             TbUserName.Text = Dns.GetHostName();
+        }
+
+        public void SetRoteName(string name)
+        {
+            LbCurrentChat.Content = name;
         }
 
         private async Task InitTcp()
@@ -47,7 +46,7 @@ namespace Chat.Client
 
             _client = new EasyClient<TextPackageInfo>(new LinePipelineFilter(), options).AsClient();
 
-            var connected = await _client.ConnectAsync(new IPEndPoint(IPAddress.Loopback, 4041));
+            var connected = await _client.ConnectAsync(new IPEndPoint(/*IPAddress.Loopback*/IPAddress.Parse("111.230.69.90"), 8888));
 
             var connectPackage = new MessagePackage<TextMessageModel>()
             {
@@ -79,9 +78,14 @@ namespace Chat.Client
                         break;
                     case OpCode.Connect:
                         LvOnlineList.Children.Clear();
+                        var allItem = new UserItemsControl("All");
+                        allItem.setRoteName = SetRoteName;
+                        LvOnlineList.Children.Add(allItem);
                         foreach (var userClient in receivePackage.Clients)
                         {
-                            LvOnlineList.Children.Add(new UserItemsControl(userClient.Username));
+                            var childItem = new UserItemsControl(userClient.Username);
+                            childItem.setRoteName = SetRoteName;
+                            LvOnlineList.Children.Add(childItem);
                         }
 
                         TbUserName.IsEnabled = false;
@@ -95,7 +99,7 @@ namespace Chat.Client
                         }));
                         break;
                     case OpCode.Single:
-                        LbCurrentChat.Content = receivePackage.Message.RemoteName;
+                        LbCurrentChat.Content = receivePackage.Message.LocalName;
                         WpChatArea.Children.Add(new MessageControl(new TextMessageModel()
                         {
                             LocalName = receivePackage.Message.LocalName,
@@ -103,6 +107,7 @@ namespace Chat.Client
                         }));
                         break;
                 }
+                Scr.ScrollToEnd();
 
                 if (connected)
                 {
@@ -183,6 +188,7 @@ namespace Chat.Client
             }));
 
             await _client.SendAsync(Encoding.UTF8.GetBytes(sendPackage.ToString()));
+            Scr.ScrollToEnd();
         }
 
         private void BtnSend_OnClick(object sender, RoutedEventArgs e)

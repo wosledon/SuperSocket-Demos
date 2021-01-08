@@ -30,4 +30,10 @@
     <ProjectReference Include="..\Chat.Models\Chat.Models.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="System.Diagnostics.PerformanceCounter">
+      <HintPath>C:\Program Files\dotnet\packs\Microsoft.WindowsDesktop.App.Ref\3.1.0\ref\netcoreapp3.1\System.Diagnostics.PerformanceCounter.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
