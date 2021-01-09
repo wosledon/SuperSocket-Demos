@@ -5,11 +5,13 @@ using SuperSocket.ProtoBase;
 using SuperSocket.SessionContainer;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using SuperSocket.Command;
 
 namespace Chat.Server
 {
@@ -133,7 +135,8 @@ namespace Chat.Server
                                     LocalName = package.Message.LocalName,
                                     RemoteName = "All",
                                     TextMessage = package.Message.TextMessage
-                                }
+                                },
+                                SEndPoint = s.LocalEndPoint
                             };
                             var asessionClients = _sessionContainer.GetSessions().Where(x=>x.SessionID!=s.SessionID);
                             foreach (var sClient in asessionClients)
@@ -152,7 +155,8 @@ namespace Chat.Server
                                     LocalName = package.Message.LocalName,
                                     RemoteName = package.Message.RemoteName,
                                     TextMessage = package.Message.TextMessage
-                                }
+                                },
+                                SEndPoint = s.LocalEndPoint
                             };
                             var remoteSession = _clients.Where(y => y.Username == package.Message.RemoteName);
                             foreach (var rSession in remoteSession)
@@ -235,19 +239,11 @@ namespace Chat.Server
         {
             while (true) 
             {
-                //if (sessions.Count != 0)
-                //{
-                //    foreach (var session in sessions)
-                //    {
-                //        await session.SendAsync(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes("Send Form Server" + "\r\n")));
-                //    }
-                //}
                 var data = JsonConvert.SerializeObject(new TextMessageModel
                 {
                     LocalName = "Server",
                     TextMessage = "Test Message"
                 });
-                //var container = host.GetSessionContainer();
                 var sessions = _sessionContainer.GetSessions();
                 if(sessions.Count() > 0)
                 {

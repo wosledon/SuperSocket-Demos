@@ -293,7 +293,7 @@ namespace SuperSocket.Server
             return new ValueTask();
         }
         /// <summary>
-        /// Session¹Ø±Õ¹·
+        /// Session¹Ø±Õºó
         /// </summary>
         /// <param name="session"></param>
         /// <param name="e"></param>

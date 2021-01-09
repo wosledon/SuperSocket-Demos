@@ -5,12 +5,14 @@ using SuperSocket.Channel;
 using SuperSocket.Client;
 using SuperSocket.ProtoBase;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Media;
 
 
@@ -141,34 +143,33 @@ namespace Chat.Client
             //}
         }
         private static Random _rd = new Random();
-        private void CreateUdpClient()
-        {
-            Socket udpClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+        //private void CreateUdpSendClient(List<UdpPackage> packages)
+        //{
+        //    Socket udpClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
-            while (true)
-            {
-                EndPoint serverPoint = new IPEndPoint(IPAddress.Parse("192.168.31.215"), 4040);
-                string message = "Console.ReadLine();";
-                byte[] data = Encoding.UTF8.GetBytes(message);
-                udpClient.SendTo(data, serverPoint);
-                Thread.Sleep(3000);
-            }
-        }
+        //    foreach (var package in packages)
+        //    {
+        //        udpClient.SendAsync(UdpHelper.Object2Bytes(package), SocketFlags.None);
+        //    }
+        //}
+
+        //private async Task CreateUdpReceiveClient(IPEndPoint endPoint)
+        //{
+        //    //Socket udpClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+        //    UdpClient udpClient = new UdpClient(AddressFamily.InterNetwork);
+            
+        //    List<UdpPackage> packages = new List<UdpPackage>();
+        //    while (true)
+        //    {
+        //        var remoteEndPoint = new IPEndPoint(IPAddress.Any, 4040);
+        //        var buffer = udpClient.Receive(ref remoteEndPoint);
+        //        packages.Add((UdpPackage)UdpHelper.Bytes2Object(buffer));
+        //        Thread.Sleep(3000);
+        //    }
+        //}
 
         private async Task Send(string message)
         {
-            ////await _client.SendAsync(Encoding.UTF8.GetBytes(message + "\r\n"));
-            //var data = new TextMessageModel
-            //{
-            //    LocalName = TbUserName.Text,
-            //    TextMessage = message
-            //};
-            //// 向ChatArea中添加组件
-            //WpChatArea.Children.Add(new SendControl(data));
-            //CreateUdpClient();
-
-            ////await _client.SendAsync(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(data) + "\r\n"));
-
             var sendPackage = new MessagePackage<TextMessageModel>()
             {
                 OpCode = LbCurrentChat.Content.Equals("All") ? OpCode.All : OpCode.Single,

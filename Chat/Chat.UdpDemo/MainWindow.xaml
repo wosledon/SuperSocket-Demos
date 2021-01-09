@@ -1,0 +1,35 @@
+﻿<Window x:Class="Chat.UdpDemo.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Chat.UdpDemo"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="900">
+    <Grid>
+        <Button x:Name="Button" Content="发送" Click="Button_OnClick" HorizontalAlignment="Left" Margin="33,85,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="TextBox" HorizontalAlignment="Left" Margin="33,43,0,0" Text="TextBox" TextWrapping="Wrap" VerticalAlignment="Top" Width="269"/>
+        <TextBox x:Name="TbReceive" HorizontalAlignment="Left" Margin="33,0,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Center" Width="269" Height="115"/>
+        <Button x:Name="BtnReceive" Click="BtnReceive_OnClick" Content="Button" HorizontalAlignment="Left" Margin="123,335,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5">
+        </Button>
+        <Border BorderBrush="Black" BorderThickness="1" Width="100" Height="100" Margin="392,27,408,308">
+            <Image x:Name="ImageSend" HorizontalAlignment="Left" Height="100" VerticalAlignment="Top" Width="100">
+
+            </Image>
+        </Border>
+        <Border BorderBrush="Black" BorderThickness="1" Width="100" Height="100" Margin="397,258,403,77">
+            <Image x:Name="ImageReceive" 
+                   HorizontalAlignment="Left" Height="100" VerticalAlignment="Top" Width="100">
+
+            </Image>
+        </Border>
+        <Button x:Name="BtnImageSend" Click="BtnImageSend_OnClick" Content="发送" HorizontalAlignment="Left" Margin="626,69,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="BtnImageReceive" Click="BtnImageReceive_OnClick" Content="接收" HorizontalAlignment="Left" Margin="626,306,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="BtnImageOpen" Click="BtnImageOpen_OnClick" Content="打开" HorizontalAlignment="Left" Margin="544,69,0,0" VerticalAlignment="Top"/>
+        <Label Content="发送:" HorizontalAlignment="Left" Margin="731,69,0,0" VerticalAlignment="Top"/>
+        <Label Content="接收:" HorizontalAlignment="Left" Margin="751,306,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="LbSend" Content="0" HorizontalAlignment="Left" Margin="792,69,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="LbReceive" Content="0" HorizontalAlignment="Left" Margin="812,308,0,0" VerticalAlignment="Top"/>
+
+    </Grid>
+</Window>
