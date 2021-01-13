@@ -5,13 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UdpClient"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800" Closing="MainWindow_OnClosing">
     <Grid>
         <GroupBox Header="Udp文本收发测试" Margin="10,0,547,0" VerticalAlignment="Top" Height="425">
             <StackPanel>
                 <TextBox x:Name="TbSendContext" Height="30" Margin="10"></TextBox>
                 <Button x:Name="BtnSendText" Click="BtnSendText_OnClick" Height="20" Margin="10">发送</Button>
-                <TextBox x:Name="TbReceiveContext" Height="120" Margin="10"
+                <TextBox x:Name="TbReceiveContext" VerticalScrollBarVisibility="Visible" Height="120" Margin="10"
                          TextWrapping="Wrap"></TextBox>
                 <Label Content="接收的数据" HorizontalAlignment="Center"></Label>
             </StackPanel>
@@ -21,14 +21,28 @@
                 <Border BorderBrush="Gray" BorderThickness="0.5">
                     <Image x:Name="ImageSend" Margin="10" Height="130"></Image>
                 </Border>
-                <Button x:Name="BtnSendImage" Click="BtnSendImage_OnClick" Content="发送" Height="20" Margin="10"></Button>
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="BtnSendImage" Click="BtnSendImage_OnClick" Content="发送" Width="120" Height="20" Margin="10"></Button>
+                    <Label x:Name="LbSendImageProcess" MinWidth="80"></Label>
+                </StackPanel>
                 <Border BorderBrush="Gray" BorderThickness="0.5">
                     <Image x:Name="ImageReceive" Margin="10" Height="130"></Image>
                 </Border>
-                <Label Content="接收的图片" HorizontalAlignment="Center" Margin="10"></Label>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="接收的图片" HorizontalAlignment="Center" Margin="10"></Label>
+                    <Label x:Name="LbReceiveImageProcess" MinWidth="120"></Label>
+                </StackPanel>
             </StackPanel>
         </GroupBox>
-        <GroupBox Header="Udp文本收发测试" Margin="514,10,10,10"/>
+        <GroupBox Header="Udp文件收发测试" Margin="514,10,10,10">
+            <StackPanel>
+                <Label x:Name="LbSendFileProcess" Content="0/0" HorizontalAlignment="Center" Margin="10"></Label>
+                <Button x:Name="BtnSendFile" Click="BtnSendFile_OnClick" Content="发送" Margin="10"></Button>
+
+                <Label x:Name="LbReceiveFileProcess" Content="0/0" HorizontalAlignment="Center" Margin="10,50,10,10"></Label>
+                <Button x:Name="BtnReceiveFilePath" Content="打开下载目录"></Button>
+            </StackPanel>
+        </GroupBox>
 
     </Grid>
 </Window>

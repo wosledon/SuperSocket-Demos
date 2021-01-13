@@ -11,17 +11,16 @@ namespace UdpClient
 {
     public class UdpHelper
     {
-        public static int Count
-        {
-            set
-            {
-                if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value));
-                Count = value > 60000 ? 60000 : value;
-            }
+        public static int Count { get; set; } = 60000;
+        //{
+        //    set
+        //    {
+        //        if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value));
+        //        Count = value > 60000 ? 60000 : value;
+        //    }
 
-            get => Count == default ? 60000 : Count;
-        }
-
+        //    get => Count == default ? 60000 : Count;
+        //}
         public static List<UdpPackage> Packages = new List<UdpPackage>();
 
         public UdpHelper() { }
@@ -59,7 +58,7 @@ namespace UdpClient
                     PackageBuffer = buffer.Skip(i * Count).Take(tmp < Count ? tmp : Count).ToArray()
                 };
 
-                result.Add(UdpHelper.Object2Bytes(slicePackage));
+                result.Add(UdpPackageToBytes(slicePackage));
             }
 
             return result;
@@ -75,7 +74,7 @@ namespace UdpClient
             {
                 return -1;
             }
-            var package = (UdpPackage)Bytes2Object(buffer);
+            var package = (UdpPackage)BytesToUdpPackage(buffer);
             Packages.Add(package);
             if (package.PackageCount == Packages.Count)
             {
@@ -94,7 +93,7 @@ namespace UdpClient
         {
             var result =
                 from package in packages
-                where package.PackageSerialNum == identity
+                where package.PackageIdentityNum == identity
                 orderby package.PackageSerialNum
                 select package;
             var size = result.Sum(x => x.PackageBuffer.Length);
@@ -113,27 +112,11 @@ namespace UdpClient
             return buffer;
         }
 
-        private void ClearPackages(int identity)
+        public static void ClearPackages(int identity)
         {
             Packages = Packages.Where(x => x.PackageIdentityNum != identity).ToList();
         }
 
-        /// <summary>
-        /// 将对象转换为byte数组
-        /// </summary>
-        /// <param name="obj">被转换对象</param>
-        /// <returns>转换后byte数组</returns>
-        public static byte[] Object2Bytes(UdpPackage obj)
-        {
-            byte[] buff;
-            using (MemoryStream ms = new MemoryStream())
-            {
-                IFormatter iFormatter = new BinaryFormatter();
-                iFormatter.Serialize(ms, obj);
-                buff = ms.GetBuffer();
-            }
-            return buff;
-        }
         /// <summary>
         /// Udp数据包转byte数组
         /// </summary>
@@ -141,12 +124,12 @@ namespace UdpClient
         /// <returns></returns>
         public static byte[] UdpPackageToBytes(UdpPackage package)
         {
-            byte[] buffer = new byte[Count+6];
+            byte[] buffer = new byte[package.PackageBuffer.Length+8];
             BitConverter.GetBytes(package.PackageIdentityNum).CopyTo(buffer, 0);
             BitConverter.GetBytes(package.PackageSerialNum).CopyTo(buffer, 2);
-            BitConverter.GetBytes(package.PackageFileMode).CopyTo(buffer, 4);
+            BitConverter.GetBytes((ushort)package.PackageFileMode).CopyTo(buffer, 4);
             BitConverter.GetBytes(package.PackageCount).CopyTo(buffer, 6);
-            package.PackageBuffer.CopyTo(buffer, 6);
+            package.PackageBuffer.CopyTo(buffer, 8);
 
 
             return buffer;
@@ -162,25 +145,10 @@ namespace UdpClient
             {
                 PackageIdentityNum = BitConverter.ToUInt16(buffer, 0),
                 PackageSerialNum = BitConverter.ToUInt16(buffer, 2),
-                PackageCount = BitConverter.ToUInt16(buffer, 4),
-                PackageBuffer = buffer.Skip(6).ToArray()
+                PackageFileMode = (UdpFileModel)BitConverter.ToInt16(buffer, 4),
+                PackageCount = BitConverter.ToUInt16(buffer, 6),
+                PackageBuffer = buffer.Skip(8).ToArray()
             };
-        }
-
-        /// <summary>
-        /// 将byte数组转换成对象
-        /// </summary>
-        /// <param name="buff">被转换byte数组</param>
-        /// <returns>转换完成后的对象</returns>
-        public static UdpPackage Bytes2Object(byte[] buff)
-        {
-            UdpPackage obj;
-            using (MemoryStream ms = new MemoryStream(buff))
-            {
-                IFormatter iFormatter = new BinaryFormatter();
-                obj = (UdpPackage)iFormatter.Deserialize(ms);
-            }
-            return obj;
         }
 
         /// <summary>
@@ -252,9 +220,52 @@ namespace UdpClient
                 System.IO.File.Delete(savePath);
             }
 
-            FileStream fs = new FileStream(savePath, FileMode.CreateNew);
+            using (FileStream fs = new FileStream(savePath, FileMode.CreateNew))
+            {
+                BinaryWriter bw = new BinaryWriter(fs);
+                bw.Write(buffer, 0, buffer.Length);
+                bw.Close();
+                fs.Close();
+            }
+        }
+
+        /// <summary>
+        /// 将文件转换为byte数组
+        /// </summary>
+        /// <param name="path">文件地址</param>
+        /// <returns>转换后的byte数组</returns>
+        public static byte[] File2Bytes(string path)
+        {
+            if (!System.IO.File.Exists(path))
+            {
+                return new byte[0];
+            }
+
+            FileInfo fi = new FileInfo(path);
+            byte[] buff = new byte[fi.Length];
+
+            FileStream fs = fi.OpenRead();
+            fs.Read(buff, 0, Convert.ToInt32(fs.Length));
+            fs.Close();
+
+            return buff;
+        }
+
+        /// <summary>
+        /// 将byte数组转换为文件并保存到指定地址
+        /// </summary>
+        /// <param name="buff">byte数组</param>
+        /// <param name="savepath">保存地址</param>
+        public static void Bytes2File(byte[] buff, string savepath)
+        {
+            if (System.IO.File.Exists(savepath))
+            {
+                System.IO.File.Delete(savepath);
+            }
+
+            FileStream fs = new FileStream(savepath, FileMode.CreateNew);
             BinaryWriter bw = new BinaryWriter(fs);
-            bw.Write(buffer, 0, buffer.Length);
+            bw.Write(buff, 0, buff.Length);
             bw.Close();
             fs.Close();
         }
