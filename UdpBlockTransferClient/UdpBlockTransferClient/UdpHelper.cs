@@ -11,43 +11,13 @@ namespace UdpBlockTransferClient
 {
     public class UdpHelper
     {
-        public int SlicePackageSize { get; set; } = 1024 * 60;
-        //{
-        //    // ReSharper disable once FunctionRecursiveOnAllPaths
-        //    get => SlicePackageSize;
-        //    set
-        //    {
-        //        //if (value < 0 || value > 1400)
-        //        //{
-        //        //    SlicePackageSize = 1024;
-        //        //}
-        //        //else
-        //        //{
-        //        //    SlicePackageSize = value;
-        //        //}
-        //        SlicePackageSize = value;
-        //    }
-        //}
+        public int SlicePackageSize { get; set; } = 50 * 1024;
 
-        public int BlockSize { get; set; } = 1024 * 1024;
-        //{
-        //    // ReSharper disable once FunctionRecursiveOnAllPaths
-        //    get => BlockSize;
-        //    set
-        //    {
-        //        if (value < 0 || value > 50 * 1024 * 1024)
-        //        {
-        //            BlockSize = 1024 * 1024;
-        //        }
-        //        else
-        //        {
-        //            BlockSize = value;
-        //        }
-        //        BlockSize = value;
-        //    }
-        //}
+        public int BlockSize { get; set; } = 10 * 1024 * 1024;
 
-        public ushort BlockSerial { get; private set; } = 1;
+        public int BlockNum { get; set; } = 0;
+
+        public ushort BlockSerial { get; private set; } = 0;
 
         private string FileName { get; set; } = "Default";
 
@@ -55,8 +25,13 @@ namespace UdpBlockTransferClient
 
         public UdpHelper()
         {
-            BlockSize = 1024 * 1024;
-            SlicePackageSize = 1024;
+
+        }
+
+        public UdpHelper(int blockSize, int slicePackageSize)
+        {
+            BlockSize = blockSize;
+            SlicePackageSize = slicePackageSize;
         }
         /// <summary>
         /// 设置切片大小
@@ -112,13 +87,13 @@ namespace UdpBlockTransferClient
 
             await using (FileStream fileRead = new FileStream(filePath, FileMode.Open, FileAccess.Read))
             {
-                long temp = fileRead.Length - BlockSize * (BlockSerial-1);
+                long temp = fileRead.Length - BlockSize * BlockSerial;
                 if (temp <= 0)
                 {
                     return null;
                 }
                 data = new byte[temp < BlockSize ? temp:BlockSize];
-                fileRead.Seek((BlockSerial-1) * BlockSize, SeekOrigin.Begin);
+                fileRead.Seek(BlockSerial * (long)BlockSize, SeekOrigin.Begin);
                 fileRead.Read(data, 0, (int)(temp < BlockSize ? temp : BlockSize));
                 fileRead.Close();
                 await fileRead.DisposeAsync();
@@ -144,7 +119,7 @@ namespace UdpBlockTransferClient
         /// <returns></returns>
         public async void AppendDataToFile(string filePath, byte[] buffer)
         {
-            await using (FileStream fileSave1 = new FileStream($"{filePath}\\{FileName}", FileMode.Append, FileAccess.Write))
+            await using (FileStream fileSave1 = new FileStream($"{filePath}\\{FileName}", FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
             {
                 fileSave1.Write(buffer, 0, buffer.Length);
                 fileSave1.Flush();
@@ -196,8 +171,9 @@ namespace UdpBlockTransferClient
         /// <param name="buffer">切片</param>
         /// <param name="lostSlices">丢失的切片序号</param>
         /// <returns>切片组装状态</returns>
-        public bool SlicePackageConcat(byte[] buffer,out ushort[] lostSlices)
+        public bool SlicePackageConcat(byte[] buffer,out ushort[] lostSlices, out bool isEnd)
         {
+            isEnd = false;
             lostSlices = null;
             if (buffer.Length == 0)
             {
@@ -212,38 +188,42 @@ namespace UdpBlockTransferClient
                     FileName = Encoding.UTF8.GetString(package.PackageBody);
                     return false;
                 case OpCode.End:
-                    return IntegrityChecks(package.PackageSliceCount, out lostSlices);
+                    return IntegrityChecks(Convert.ToUInt16(Encoding.UTF8.GetString(package.PackageBody)), out lostSlices, out isEnd);
                 case OpCode.Notice:
-                    BlockSize = Convert.ToInt32(Encoding.UTF8.GetString(package.PackageBody));
+                    BlockNum = Convert.ToInt32(Encoding.UTF8.GetString(package.PackageBody));
                     return false;
             }
 
-            if (package.PackageSliceCount == package.PackageSliceSerial)
+            BlockSlicePackages.Add(package);
+
+            // 块完整性检查
+            if (package.PackageSliceCount == 
+                BlockSlicePackages.Count(x=>x.PackageBlockSerial == package.PackageBlockSerial))
             {
                 return true;
             }
-
-            BlockSlicePackages.Add(package);
 
             return false;
         }
 
         /// <summary>
-        /// 块完整性检查
+        /// 数据完整性检查
         /// </summary>
         /// <param name="block"></param>
         /// <param name="lostSlices">返回数组第0为是块号</param>
         /// <returns></returns>
-        public bool IntegrityChecks(ushort block, out ushort[] lostSlices)
+        public bool IntegrityChecks(ushort block, out ushort[] lostSlices, out bool isEnd)
         {
-            if (Math.Abs(block - BlockSerial) == 1)
+            isEnd = false;
+            if (block == BlockSerial)
             {
+                isEnd = true;
                 lostSlices = null;
                 return true;
             }
 
             var res = BlockSlicePackages.Where(x => x.PackageBlockSerial == block)
-                .Where(x => Enumerable.Range(1, block).Contains(x.PackageBlockSerial)).ToList();
+                .Where(x => Enumerable.Range(0, block).Contains(x.PackageBlockSerial)).ToList();
             var temp = res.Select(x => x.PackageSliceSerial).ToList();
             temp.Insert(BlockSerial, 0);
             lostSlices = temp.ToArray();
@@ -266,8 +246,15 @@ namespace UdpBlockTransferClient
             var size = result.Sum(x => x.PackageBody.Length);
 
             byte[] buffer = null;
-            var packageSize = packages.First().PackageSliceCount;
-            if (result.Count() == (packageSize-1))
+            // ReSharper disable once PossibleNullReferenceException
+            var thisBlock = packages.Where(x => x.PackageBlockSerial == BlockSerial).ToList();
+            if (thisBlock.Count == 0)
+            {
+                BlockSerial++;
+                return null;
+            }
+            var packageSize = thisBlock[0].PackageSliceCount;
+            if (result.Count() == packageSize)
             {
                 buffer = new byte[size];
                 foreach (var buffPackage in result)
@@ -296,7 +283,7 @@ namespace UdpBlockTransferClient
         public void ClearSlicePackages(int identity, int block)
         {
             BlockSlicePackages =
-                BlockSlicePackages.Where(x => x.PackageIdentity != identity && x.PackageBlockSerial != block).ToList();
+                BlockSlicePackages.Where(x => (x.PackageIdentity != identity) && (x.PackageBlockSerial != block)).ToList();
         }
     }
 }

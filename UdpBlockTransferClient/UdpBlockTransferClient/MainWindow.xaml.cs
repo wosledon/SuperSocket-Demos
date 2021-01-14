@@ -46,28 +46,40 @@ namespace UdpBlockTransferClient
         private void InitClients()
         {
             _sendClient = new UdpClient(4040);
-            _sendClient.Connect(IPAddress.Parse("127.0.0.1"), 11000);
+            _sendClient.Connect(IPAddress.Parse(GetLocalIp()), 11000);
 
             _receiveClient = new UdpClient(11000);
         }
 
         private void InitThreads()
         {
-            _threads = new Thread[_threadNums];
+            //_threads = new Thread[_threadNums];
 
-            for (int i = 0; i < _threadNums; i++)
+            //for (int i = 0; i < _threadNums; i++)
+            //{
+            //    _threads[i] = new Thread(new ThreadStart(ReceiveFile));
+            //    _threads[i].Start();
+            //}
+
+            ThreadPool.QueueUserWorkItem(ReceiveFile);
+        }
+
+        private string GetLocalIp()
+        {
+            string addressIp = string.Empty;
+            foreach (IPAddress ipAddress in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
             {
-                _threads[i] = new Thread(new ThreadStart(ReceiveFile));
-                _threads[i].Start();
+                if (ipAddress.AddressFamily.ToString() == "InterNetwork")
+                {
+                    addressIp = ipAddress.ToString();
+                }
             }
+            return addressIp;
         }
 
         private void DesThreads()
         {
-            foreach (var thread in _threads)
-            {
-                thread.Abort();
-            }
+            
         }
 
 
@@ -82,7 +94,7 @@ namespace UdpBlockTransferClient
         private async Task SendFile()
         {
             OpenFileDialog dialog = new OpenFileDialog();
-            dialog.Filter = "压缩文件|*.zip;*.jar;*.rar;*.txt";//文件扩展名
+            dialog.Filter = "压缩文件|*.zip;*.jar;*.rar;*.txt;*.png;*.jpg";//文件扩展名
             dialog.CheckFileExists = true;
             dialog.ShowDialog();
             if (!string.IsNullOrEmpty(dialog.FileName))//可以上传压缩包.zip 或者jar包
@@ -111,7 +123,6 @@ namespace UdpBlockTransferClient
                         }
                     }
                     await _sendClient.SendAsync(sendHelper.EndBlock(1), sendHelper.EndBlock(1).Length);
-                    await Task.Delay(5);
                 }
                 catch (Exception ex)
                 {
@@ -121,32 +132,49 @@ namespace UdpBlockTransferClient
         }
 
         private int rCount = 0;
-        private void ReceiveFile()
+        private int bCount = 0;
+        private void ReceiveFile(object? state)
         {
-            IPEndPoint remoteIpEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 11000);
+            IPEndPoint remoteIpEndPoint = new IPEndPoint(IPAddress.Any, 11000);
             //var udpClient = new System.Net.Sockets.UdpClient();
             while (true)
             {
-                Byte[] receiveBytes = _receiveClient.Receive(ref remoteIpEndPoint);
-                //var name = Thread.CurrentThread.ManagedThreadId.ToString();
-                Dispatcher.Invoke(() =>
-                {
-                    LbReceiveProcess.Content = $"{++rCount}";
-                });
                 lock (locker)
                 {
                     try
                     {
-                        ushort[] lostSlice = null;
-                        if (_udpHelper.SlicePackageConcat(receiveBytes, out lostSlice))
+                        var receiveBytes = _receiveClient.Receive(ref remoteIpEndPoint);
+                        //var name = Thread.CurrentThread.ManagedThreadId.ToString();
+                        if (receiveBytes.Length == 0)
                         {
-                            var buffer = _udpHelper.SlicePackageMergeToBlock(_udpHelper.BlockSlicePackages, 1);
-                            _udpHelper.AppendDataToFile("E:", buffer);
-                            Dispatcher.Invoke(() =>
+                            //
+                        }
+                        Dispatcher.Invoke(() =>
+                        {
+                            LbReceiveProcess.Content = $"{++rCount}/{bCount}";
+                        });
+                        ushort[] lostSlice = null;
+                        bool isEnd = false;
+                        if (_udpHelper.SlicePackageConcat(receiveBytes, out lostSlice, out isEnd))
+                        {
+                            if (!isEnd)
                             {
-                                LbReceiveProcess.Content = $"{++rCount}";
-                                MessageBox.Show("接收完成!");
-                            });
+                                var buffer = _udpHelper.SlicePackageMergeToBlock(_udpHelper.BlockSlicePackages, 1);
+                                if (buffer != null)
+                                {
+                                    _udpHelper.AppendDataToFile("E:", buffer);
+                                    Dispatcher.Invoke(() =>
+                                    {
+                                        LbReceiveProcess.Content = $"{++rCount}/{++bCount}";
+                                    });
+                                }
+                            }
+                            else
+                            {
+                                MessageBox.Show("传输完成!");
+                            }
+
+                            Thread.Sleep(1);
                         }
 
                         if (lostSlice != null)

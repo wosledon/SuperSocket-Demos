@@ -11,6 +11,5 @@
         <Label x:Name="LbSendProcess" Content="0/0" HorizontalAlignment="Left" Margin="116,0,0,0" VerticalAlignment="Center" Height="63" Width="112"/>
         <Label Content="接收进度 :" HorizontalAlignment="Left" Margin="512,106,0,0" VerticalAlignment="Top" Height="58" Width="109"/>
         <Label x:Name="LbReceiveProcess" Content="0/0" HorizontalAlignment="Left" Margin="510,186,0,0" VerticalAlignment="Top" Height="55" Width="95"/>
-
     </Grid>
 </Window>
