@@ -11,6 +11,7 @@ namespace PMChat.Models
         Connect = 0,
         DisConnect = 1,
         Single = 2,
-        All = 3
+        All = 3,
+        ACK = 4
     }
 }

@@ -197,9 +197,6 @@ namespace PMChat.Client
                 ReadAsDemand = true
             };
 
-            _sendImageTcpClient = new EasyClient<TextPackageInfo>(new LinePipelineFilter(), options).AsClient();
-            var connected = await _sendImageTcpClient.ConnectAsync(new IPEndPoint(IPAddress.Loopback, 8888));
-
             Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
             openFileDialog.Title = "选择文件";
             openFileDialog.Filter = "jpg|*.jpg|jpeg|*.jpeg";
@@ -219,7 +216,9 @@ namespace PMChat.Client
             {
                 LocalName = TbUserName.Text
             }, ImageHelper.BytesToBitmapImage(buffer)));
+            Scr.ScrollToEnd();
 
+            // 发送确认码, 并接收确认
             var imagePackage = new TcpPackage()
             {
                 OpCode = LbChatWith.Content.Equals("All") ? OpCode.All : OpCode.Single,
@@ -228,59 +227,66 @@ namespace PMChat.Client
                 RemoteName = LbChatWith.Content.ToString()
             };
 
-            var msg = imagePackage.ToString();
+            #region 发送接收确认码, 再创建UDP进行通信, 比较麻烦, 预留, 重写
+            //_sendImageTcpClient = new EasyClient<TextPackageInfo>(new LinePipelineFilter(), options).AsClient();
+            //var connected = await _sendImageTcpClient.ConnectAsync(new IPEndPoint(IPAddress.Loopback, 8888));
 
-            await _sendImageTcpClient.SendAsync(Encoding.UTF8.GetBytes(msg));
+            //var msg = imagePackage.ToString();
 
-            Scr.ScrollToEnd();
+            //await _sendImageTcpClient.SendAsync(Encoding.UTF8.GetBytes(msg));
 
-            UdpConfigPackage package = null;
-            while (true)
-            {
-                var data = await _sendImageTcpClient.ReceiveAsync();
-                package = TcpPackage.JsonToPackage(data.Text).Config;
-
-                if (package != null)
-                {
-                    break;
-                }
-
-                await Task.Delay(100);
-            }
-
-            _sendUdpImageClient = new UdpClientManager();
-            await _sendUdpImageClient.CreateUdpSendClientAsync(new IPEndPoint(IPAddress.Loopback, _sendUdpPort));
-            var point = package.ReceiveEndPoint.Split("|");
-            _sendUdpImageClient.Connect(IPAddress.Parse(point[0]), Convert.ToInt32(point[1]));
-
-            var packageManager = new UdpPackageManager(8, fileName);
-            var first = packageManager.StartBlock(1);
-            await _sendUdpImageClient.SendAsync(first, first.Length);
-            while (true)
-            {
-                var imageBuffer = await packageManager.ReadFileToBlock(fileName);
-                if (imageBuffer == null)
-                {
-                    break;
-                }
-
-                var packages = await packageManager.BlockToSlice(imageBuffer, 1);
-                while (packages.Length() > 0)
-                {
-                    var pBuffer = await packages.DequeueAsync();
-                    await _sendUdpImageClient.SendAsync(pBuffer, pBuffer.Length);
-                }
-            }
-            await _sendUdpImageClient.SendAsync(packageManager.EndBlock(1), packageManager.EndBlock(1).Length);
-
-            //while (packages.Length() > 0)
+            //UdpConfigPackage package = null;
+            //while (true)
             //{
-            //    var data = await packages.DequeueAsync();
-            //    await _sendUdpImageClient.SendAsync(data, data.Length);
+            //    var data = await _sendImageTcpClient.ReceiveAsync();
+            //    package = TcpPackage.JsonToPackage(data.Text).Config;
+
+            //    if (package != null)
+            //    {
+            //        break;
+            //    }
+
+            //    await Task.Delay(100);
             //}
 
-            await _sendImageTcpClient.CloseAsync();
-            //await _sendUdpImageClient.UdpClientCloseAsync();
+            //// 创建Udp客户端
+            //_sendUdpImageClient = new UdpClientManager();
+            //await _sendUdpImageClient.CreateUdpSendClientAsync(new IPEndPoint(IPAddress.Loopback, _sendUdpPort));
+            //var point = package.ReceiveEndPoint.Split("|");
+            //_sendUdpImageClient.Connect(IPAddress.Parse(point[0]), Convert.ToInt32(point[1]));
+
+            //// 发送Image
+            //var packageManager = new UdpPackageManager(8, fileName);
+            //var first = packageManager.StartBlock(1);
+            //await _sendUdpImageClient.SendAsync(first, first.Length);
+            //while (true)
+            //{
+            //    var imageBuffer = await packageManager.ReadFileToBlock(fileName);
+            //    if (imageBuffer == null)
+            //    {
+            //        break;
+            //    }
+
+            //    var packages = await packageManager.BlockToSlice(imageBuffer, 1);
+            //    while (packages.Length() > 0)
+            //    {
+            //        var pBuffer = await packages.DequeueAsync();
+            //        await _sendUdpImageClient.SendAsync(pBuffer, pBuffer.Length);
+            //    }
+            //}
+            //await _sendUdpImageClient.SendAsync(packageManager.EndBlock(1), packageManager.EndBlock(1).Length);
+
+            ////while (packages.Length() > 0)
+            ////{
+            ////    var data = await packages.DequeueAsync();
+            ////    await _sendUdpImageClient.SendAsync(data, data.Length);
+            ////}
+
+            //await _sendImageTcpClient.CloseAsync();
+            ////await _sendUdpImageClient.UdpClientCloseAsync();
+            #endregion
+
+
         }
 
         private async Task ReceiveImage(TcpPackage receivePackage)
@@ -328,6 +334,8 @@ namespace PMChat.Client
 #pragma warning disable 4014
                 SendMessage(TbSendArea.Text);
 #pragma warning restore 4014
+                TbSendArea.Clear();
+                TbSendArea.Focus();
             }
         }
     }
