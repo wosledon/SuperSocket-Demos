@@ -15,6 +15,7 @@
     <ProjectReference Include="..\..\src\SuperSocket.Server\SuperSocket.Server.csproj" />
     <ProjectReference Include="..\..\src\SuperSocket.SessionContainer\SuperSocket.SessionContainer.csproj" />
     <ProjectReference Include="..\..\test\SuperSocket.Benchmarks\SuperSocket.Benchmarks.csproj" />
+    <ProjectReference Include="..\PMChat.Models\PMChat.Models.csproj" />
   </ItemGroup>
 
 

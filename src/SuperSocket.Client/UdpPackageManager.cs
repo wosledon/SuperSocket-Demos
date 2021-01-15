@@ -44,13 +44,21 @@ namespace SuperSocket.Client
         /// 接收的片集合
         /// </summary>
         private List<UdpPackage> _slicesList = new List<UdpPackage>();
+
         /// <summary>
         /// 初始化包管理器
         /// </summary>
         /// <param name="headerSize">数据头长度</param>
-        public UdpPackageManager(ushort headerSize)
+        /// <param name="filePath"></param>
+        public UdpPackageManager(ushort headerSize, string filePath)
         {
             HeaderSize = headerSize;
+            FileName = Path.GetFileName(filePath);
+        }
+
+        public List<UdpPackage> GetSliceList()
+        {
+            return _slicesList;
         }
 
         /// <summary>
@@ -131,6 +139,35 @@ namespace SuperSocket.Client
             NextBlock();
 
             return queue;
+        }
+
+        /// <summary>
+        ///  发送第一块
+        /// </summary>
+        /// <param name="identity"></param>
+        /// <returns></returns>
+        public byte[] StartBlock(byte identity)
+        {
+            return new UdpPackage()
+            {
+                FileIdentity = identity,
+                OpCode = UdpOpCode.Start,
+                Buffer = Encoding.UTF8.GetBytes(FileName)
+            }.PackageToBytes();
+        }
+        /// <summary>
+        /// 发送最后一块
+        /// </summary>
+        /// <param name="identity"></param>
+        /// <returns></returns>
+        public byte[] EndBlock(byte identity)
+        {
+            return new UdpPackage()
+            {
+                FileIdentity = identity,
+                OpCode = UdpOpCode.End,
+                Buffer = Encoding.UTF8.GetBytes(BlockSerial.ToString())
+            }.PackageToBytes();
         }
         /// <summary>
         /// 收集接收端收到的切片

@@ -5,39 +5,44 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PMChat.Client"
         mc:Ignorable="d"
-        Title="PMChat" Height="475" Width="800" ResizeMode="CanMinimize"  WindowStartupLocation="CenterScreen">
+        Title="PMChat" Height="475" Width="810" ResizeMode="CanMinimize"  WindowStartupLocation="CenterScreen">
     <Grid>
         <StackPanel Orientation="Horizontal">
             <GroupBox BorderBrush="Gray" Header="Online" BorderThickness="0.5" Margin="5, 5,5,10">
-                <StackPanel x:Name="SpFriends" Width="200" Height="400" Margin="2">
-                    
-                </StackPanel>
+                <ScrollViewer Margin="0" VerticalScrollBarVisibility="Auto">
+                    <StackPanel x:Name="SpOnlineList" Width="200" Height="400" Margin="2">
+
+                    </StackPanel>
+                </ScrollViewer>
             </GroupBox>
             <StackPanel Width="540" Margin="7">
                 <GroupBox Header="连接信息" FontSize="10" Height="45">
                     <StackPanel Orientation="Horizontal">
                         <StackPanel Orientation="Horizontal" Width="auto">
                             <Label VerticalAlignment="Center">当前对话:</Label>
-                            <Label x:Name="LbChatWith" VerticalAlignment="Center" Width="auto" Foreground="Green">[ All ]</Label>
+                            <Label x:Name="LbChatWith" VerticalAlignment="Center" Width="auto" Foreground="Green">All</Label>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="200,0,0,0">
                             <Label>用户名:</Label>
                             <TextBox x:Name="TbUserName" Width="100" Padding="5, 1,1,1" 
                                      VerticalContentAlignment="Center" Margin="0,3,3,3"></TextBox>
                             <Border x:Name="BdConnectState" Width="20" Height="20" Margin="10,0,0,0" BorderBrush="LightGray" BorderThickness="0.5"></Border>
-                            <Button x:Name="BtnConnectServer" Margin="5,3,3,3">连接服务器</Button>
+                            <Button x:Name="BtnConnectServer" Click="BtnConnectServer_OnClick" Margin="5,3,3,3">连接服务器</Button>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
                 <GroupBox Height="250">
-                    <StackPanel CanVerticallyScroll="True"></StackPanel>
+                    <!--<StackPanel x:Name="ChatArea" CanVerticallyScroll="True"></StackPanel>-->
+                    <ScrollViewer x:Name="Scr" Margin="0" VerticalScrollBarVisibility="Auto">
+                        <WrapPanel x:Name="ChatArea"/>
+                    </ScrollViewer>
                 </GroupBox>
                 <StackPanel Height="30" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button x:Name="BtnSendFile" MinWidth="50" Width="70" Margin="5">传输文件</Button>
-                    <Button x:Name="BtnSendImage" MinWidth="50" Width="70" Margin="5">发送图片</Button>
-                    <Button x:Name="BtnSendMessage" MinWidth="50" Width="70" Margin="5">发送</Button>
+                    <Button x:Name="BtnSendFile" Click="BtnSendFile_OnClick" MinWidth="50" Width="70" Margin="5">传输文件</Button>
+                    <Button x:Name="BtnSendImage" Click="BtnSendImage_OnClick" MinWidth="50" Width="70" Margin="5">发送图片</Button>
+                    <Button x:Name="BtnSendMessage" Click="BtnSendMessage_OnClick" IsDefault="True" MinWidth="50" Width="70" Margin="5">发送</Button>
                 </StackPanel>
-                <TextBox TextWrapping="Wrap" Padding="5" Height="95"></TextBox>
+                <TextBox x:Name="TbSendArea" TextWrapping="Wrap" Padding="5" Height="95"></TextBox>
             </StackPanel>
         </StackPanel>
     </Grid>

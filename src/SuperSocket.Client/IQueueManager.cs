@@ -11,7 +11,7 @@ namespace SuperSocket.Client
         Task<byte[]> DequeueAsync();
         Task EnqueueAsync(byte[] buffer);
         Task<byte[][]> ToArrayAsync();
-        Task<int> Length();
+        int Length();
 
         //Task MultiThreadingDequeue(IUdpPackageManager<IUdpPackage> packageManager, IUdpClientManager udpClientManager);
         //Task MultiThreadingEnqueue(IUdpPackageManager<IUdpPackage> packageManager, IUdpClientManager udpClientManager);

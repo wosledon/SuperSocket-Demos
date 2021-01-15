@@ -42,9 +42,9 @@ namespace SuperSocket.Client
             return await Task.Run(() => Queue.ToArray());
         }
 
-        public async Task<int> Length()
+        public int Length()
         {
-            return await Task.Run(() => Queue.Count);
+            return Queue.Count;
         }
 
         //public Task MultiThreadingDequeue(IUdpPackageManager<IUdpPackage> packageManager, IUdpClientManager udpClientManager)

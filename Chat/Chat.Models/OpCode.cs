@@ -1,6 +1,6 @@
 ﻿namespace Chat.Models
 {
-    public enum OpCode
+    public enum OpCode: byte
     {
         Connect = 1,
         DisConnect = 2,

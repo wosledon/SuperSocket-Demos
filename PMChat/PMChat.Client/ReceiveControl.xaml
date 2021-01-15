@@ -1,0 +1,23 @@
+﻿<UserControl x:Class="PMChat.Client.ReceiveControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PMChat.Client"
+             mc:Ignorable="d" Height="auto" Width="540">
+    <Grid>
+        <WrapPanel>
+            <Label x:Name="LabChatName" Foreground="Green" Content="[ 张三 ]" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+            <Label Content="对" HorizontalAlignment="Left" Margin="0,10,0,10" VerticalAlignment="Top"/>
+            <Label x:Name="LabSayTo" Content="[ All ]" Foreground="OrangeRed" HorizontalAlignment="Left" Margin="0,10,0,10" VerticalAlignment="Top"/>
+            <Label Content="说:" HorizontalAlignment="Left" Margin="0,10,0,10" VerticalAlignment="Top"/>
+        </WrapPanel>
+        <WrapPanel x:Name="WpChatContext" HorizontalAlignment="Left" Margin="30, 40,20,10" Width="auto" Height="auto">
+            <TextBlock x:Name="TbChatContext" Text="Hello World" TextWrapping="Wrap" Padding="10"
+                       HorizontalAlignment="Right" VerticalAlignment="Top" MaxWidth="200" Height="auto">
+                <TextBlock.Background>
+                    <ImageBrush x:Name="TbImage" Stretch="Uniform"/>
+                </TextBlock.Background></TextBlock>
+        </WrapPanel>
+    </Grid>
+</UserControl>

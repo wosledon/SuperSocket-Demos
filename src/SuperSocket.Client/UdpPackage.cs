@@ -9,27 +9,31 @@ namespace SuperSocket.Client
         /// <summary>
         /// 文件传输标识
         /// </summary>
-        public byte FileIdentity { get; set; }
+        public byte FileIdentity { get; set; } = 0;
         /// <summary>
         /// Udp操作码
         /// </summary>
         public UdpOpCode OpCode { get; set; } = UdpOpCode.Message;
+
         /// <summary>
         /// 文件切块时的编号
         /// </summary>
-        public ushort BlockSerial { get; set; }
+        public ushort BlockSerial { get; set; } = 0;
+
         /// <summary>
         /// 块切片后的编号
         /// </summary>
-        public ushort SliceSerial { get; set; }
+        public ushort SliceSerial { get; set; } = 0;
+
         /// <summary>
         /// 块切片的数量
         /// </summary>
-        public ushort SliceCount { get; set; }
+        public ushort SliceCount { get; set; } = 0;
+
         /// <summary>
         /// 携带的数据
         /// </summary>
-        public byte[] Buffer { get; set; }
+        public byte[] Buffer { get; set; } = null;
         public byte[] PackageToBytes()
         {
             byte[] buffer = new byte[8 + Buffer.Length];

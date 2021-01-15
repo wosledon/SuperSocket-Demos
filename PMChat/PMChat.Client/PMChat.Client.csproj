@@ -20,6 +20,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\SuperSocket.Channel\SuperSocket.Channel.csproj" />
+    <ProjectReference Include="..\..\src\SuperSocket.Client.Proxy\SuperSocket.Client.Proxy.csproj" />
+    <ProjectReference Include="..\..\src\SuperSocket.Client\SuperSocket.Client.csproj" />
+    <ProjectReference Include="..\..\src\SuperSocket.Command\SuperSocket.Command.csproj" />
+    <ProjectReference Include="..\..\src\SuperSocket.Http\SuperSocket.Http.csproj" />
+    <ProjectReference Include="..\..\src\SuperSocket.Primitives\SuperSocket.Primitives.csproj" />
+    <ProjectReference Include="..\..\src\SuperSocket.ProtoBase\SuperSocket.ProtoBase.csproj" />
+    <ProjectReference Include="..\..\src\SuperSocket.Server\SuperSocket.Server.csproj" />
+    <ProjectReference Include="..\..\src\SuperSocket.SessionContainer\SuperSocket.SessionContainer.csproj" />
+    <ProjectReference Include="..\..\test\SuperSocket.Benchmarks\SuperSocket.Benchmarks.csproj" />
+    <ProjectReference Include="..\PMChat.Models\PMChat.Models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
