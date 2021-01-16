@@ -60,6 +60,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UdpBlockTransferClient", "UdpBlockTransferClient\UdpBlockTransferClient\UdpBlockTransferClient.csproj", "{B406F256-EFE6-4901-8E4F-4D1612460581}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PMChat", "PMChat", "{6AC70B68-9E55-45D7-B1F4-53FE5CAD6CCC}"
+	ProjectSection(SolutionItems) = preProject
+		PMChat\readme.md = PMChat\readme.md
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PMChat.Client", "PMChat\PMChat.Client\PMChat.Client.csproj", "{76F78C1B-063B-4EEF-B95B-2506DBAB09DE}"
 EndProject
@@ -69,7 +72,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PMChat.WebServer", "PMChat\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PMChat.Models", "PMChat\PMChat.Models\PMChat.Models.csproj", "{913E0B8D-6D25-4EB1-98DA-E5B98BB2A247}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PMChat.TaskTest", "PMChat\PMChat.TaskTest\PMChat.TaskTest.csproj", "{34F8E605-B2BE-48E4-AC8A-3975DAF623C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PMChat.TaskTest", "PMChat\PMChat.TaskTest\PMChat.TaskTest.csproj", "{34F8E605-B2BE-48E4-AC8A-3975DAF623C1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

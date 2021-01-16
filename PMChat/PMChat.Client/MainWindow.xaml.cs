@@ -355,6 +355,11 @@ namespace PMChat.Client
                     {
                         if (!transferFinished)
                         {
+                            // 只接收了一块数据就进行了显示操作
+                            // 图片大小限定: 10M
+                            // 解决方案: 将图片缓存到本地, 再读取到程序中
+                            // 缓存方案: 像文件一样按块写入本地, 最后再进行调用
+                            // 缓存地址: 软件安装目录
                             var buff = udpPackageManager.SliceToBlock(udpPackageManager.GetSliceList(), 1).Result;
                             if (buff != null)
                             {
@@ -363,6 +368,7 @@ namespace PMChat.Client
                                     var bitmap = ImageHelper.BytesToBitmapImage(buff);
                                     ChatArea.Children.Add(new ReceiveControl(receivePackage, bitmap));
                                 });
+                                break;
                             }
                         }
                         else
@@ -373,6 +379,7 @@ namespace PMChat.Client
                         //Thread.Sleep(10);
                     }
                 }
+                //MessageBox.Show("Client回收");
             }
             //udpClient.Client.Close(5000);
         }
