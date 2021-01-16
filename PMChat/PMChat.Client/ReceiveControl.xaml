@@ -13,11 +13,12 @@
             <Label Content="说:" HorizontalAlignment="Left" Margin="0,10,0,10" VerticalAlignment="Top"/>
         </WrapPanel>
         <WrapPanel x:Name="WpChatContext" HorizontalAlignment="Left" Margin="30, 40,20,10" Width="auto" Height="auto">
-            <TextBlock x:Name="TbChatContext" Text="Hello World" TextWrapping="Wrap" Padding="10"
+            <TextBlock x:Name="TbChatContext" Text="" TextWrapping="Wrap" Padding="10"
                        HorizontalAlignment="Right" VerticalAlignment="Top" MaxWidth="200" Height="auto">
                 <TextBlock.Background>
                     <ImageBrush x:Name="TbImage" Stretch="Uniform"/>
-                </TextBlock.Background></TextBlock>
+                </TextBlock.Background>
+            </TextBlock>
         </WrapPanel>
     </Grid>
 </UserControl>

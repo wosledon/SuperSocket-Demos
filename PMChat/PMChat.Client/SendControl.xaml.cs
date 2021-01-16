@@ -30,7 +30,7 @@ namespace PMChat.Client
 
             if(image != null)
             {
-                TbChatContext.Width = 100;
+                TbChatContext.Width = 200;
                 TbChatContext.Height = 100;
                 TbImage.ImageSource = image;
             }

@@ -18,7 +18,7 @@ namespace SuperSocket.Client
         /// <summary>
         /// 最大切片大小: 65000B
         /// </summary>
-        private const ushort MaxSliceSize = 65000;
+        private const ushort MaxSliceSize = 60000;
 
         /// <summary>
         /// 数据头长度
@@ -39,7 +39,7 @@ namespace SuperSocket.Client
         /// <summary>
         /// 文件名
         /// </summary>
-        public string FileName;
+        public string FileName = new Guid().ToString();
         /// <summary>
         /// 接收的片集合
         /// </summary>
@@ -67,7 +67,7 @@ namespace SuperSocket.Client
         /// <param name="headerSize">数据头长度</param>
         /// <param name="blockSize">块大小: 默认5M</param>
         /// <param name="sliceSize"></param>
-        public UdpPackageManager(ushort headerSize, int blockSize = 5 * 1024 * 1024, ushort sliceSize = 1024)
+        public UdpPackageManager(ushort headerSize, int blockSize = 5 * 1024 * 1024, ushort sliceSize = 60000)
         {
             HeaderSize = headerSize;
             BlockSize = blockSize > MaxBlockSize ? MaxBlockSize : blockSize;
@@ -119,9 +119,9 @@ namespace SuperSocket.Client
                 sliceCount++;
             }
 
-            for (ushort i = 1; i <= sliceCount; i++)
+            for (ushort i = 0; i < sliceCount; i++)
             {
-                var tmp = buffer.Length - (i - 1) * SliceSize;
+                var tmp = buffer.Length - i * SliceSize;
                 var blockSlicePackage = new UdpPackage()
                 {
                     FileIdentity = identity,
@@ -129,7 +129,7 @@ namespace SuperSocket.Client
                     BlockSerial = BlockSerial,
                     SliceSerial = i,
                     SliceCount = sliceCount,
-                    Buffer = buffer.Skip((i - 1) * SliceSize)
+                    Buffer = buffer.Skip(i * SliceSize)
                         .Take(tmp < SliceSize ? tmp : SliceSize).ToArray()
                 };
 
@@ -190,7 +190,7 @@ namespace SuperSocket.Client
                     return BlockIntegrityChecks(package.BlockSerial, out lostSlices, out transferFinished);
                 case UdpOpCode.Message:
                     _slicesList.Add(package);
-                    _slicesList = _slicesList.GroupBy(x => x.BlockSerial).Select(y => y.First()).ToList();
+                    //_slicesList = _slicesList.GroupBy(x => x.BlockSerial).Select(y => y.First()).ToList();
 
                     if (package.SliceCount
                         == _slicesList.Count(x => x.BlockSerial == BlockSerial))
@@ -220,7 +220,7 @@ namespace SuperSocket.Client
             var res = _slicesList.Where(x => x.BlockSerial == blockSerial)
                 .Where(x => Enumerable.Range(0, blockSerial).Contains(x.BlockSerial)).ToList();
             var temp = res.Select(x => x.BlockSerial).ToList();
-            temp.Insert(BlockSerial, 0);
+            temp.Insert(0, BlockSerial);
             lostSlices = temp.ToArray();
             transferFinished = true;
             return false;

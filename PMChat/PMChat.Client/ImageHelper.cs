@@ -37,7 +37,7 @@ namespace PMChat.Client
             bim.BeginInit();
             bim.StreamSource = new MemoryStream(buffer);
             bim.EndInit();
-
+            
 
             return bim;
         }

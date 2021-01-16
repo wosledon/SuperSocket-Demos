@@ -27,16 +27,16 @@ namespace PMChat.Client
 
             LabChatName.Content = $"[ {package.LocalName} ]";
             LabSayTo.Content = $"[ {package.RemoteName} ]";
-            TbChatContext.Text = package.Message;
 
             if (image != null)
             {
-                TbChatContext.Width = 100;
+                TbChatContext.Width = 200;
                 TbChatContext.Height = 100;
                 TbImage.ImageSource = image;
             }
             else
             {
+                TbChatContext.Text = package.Message;
                 TbChatContext.Background = new SolidColorBrush(Colors.CornflowerBlue);
             }
         }

@@ -10,7 +10,7 @@ namespace PMChat.Models
         public string LocalName { get; set; }
         public string RemoteName { get; set; }
         public MessageType MessageType { get; set; } = MessageType.Text;
-        public string Message { get; set; } = String.Empty;
+        public string Message { get; set; } = string.Empty;
         public List<ClientInfo> Clients { get; set; } = null;
         public UdpConfigPackage Config { get; set; }
 

@@ -6,6 +6,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using PMChat.Models;
 using SuperSocket;
 using SuperSocket.ProtoBase;
@@ -75,6 +76,7 @@ namespace PMChat.Server
                 .UsePackageHandler(async (s, p) =>
                 {
                     var package = TcpPackage.JsonToPackage(p.Text);
+                    Console.WriteLine($"\n{p.Text}\n");
 
                     switch (package.OpCode)
                     {
@@ -115,18 +117,18 @@ namespace PMChat.Server
                                     };
                                     break;
                                 case MessageType.Image:
-                                    var imgConfig = new UdpConfigPackage()
-                                    {
-                                        SendEndPoint = $"{((IPEndPoint)s.LocalEndPoint).Address}|{11000}",
-                                        ReceiveEndPoint = $"{((IPEndPoint)s.RemoteEndPoint).Address}|{12000}"
-                                    };
+                                    //var imgConfig = new UdpConfigPackage()
+                                    //{
+                                    //    SendEndPoint = $"{((IPEndPoint)s.LocalEndPoint).Address}|{11000}",
+                                    //    ReceiveEndPoint = $"{((IPEndPoint)s.RemoteEndPoint).Address}|{12000}"
+                                    //};
                                     allData = new TcpPackage()
                                     {
                                         OpCode = OpCode.All,
                                         MessageType = MessageType.Image,
                                         LocalName = "Server",
                                         RemoteName = package.LocalName,
-                                        Config = imgConfig
+                                        Config = null
                                     };
                                     break;
                                 case MessageType.File:
@@ -164,18 +166,18 @@ namespace PMChat.Server
                                     };
                                     break;
                                 case MessageType.Image:
-                                    var imgConfig = new UdpConfigPackage()
-                                    {
-                                        SendEndPoint = $"{((IPEndPoint)s.LocalEndPoint).Address}.{11000}",
-                                        ReceiveEndPoint = $"{((IPEndPoint)s.RemoteEndPoint).Address}.{12000}"
-                                    };
+                                    //var imgConfig = new UdpConfigPackage()
+                                    //{
+                                    //    SendEndPoint = $"{((IPEndPoint)s.LocalEndPoint).Address}.{11000}",
+                                    //    ReceiveEndPoint = $"{((IPEndPoint)s.RemoteEndPoint).Address}.{12000}"
+                                    //};
                                     singleData = new TcpPackage()
                                     {
                                         OpCode = OpCode.Single,
                                         MessageType = MessageType.Image,
                                         LocalName = "Server",
                                         RemoteName = package.LocalName,
-                                        Message = imgConfig.ToString()
+                                        Message = null
                                     };
                                     break;
                                 case MessageType.File:
@@ -205,6 +207,57 @@ namespace PMChat.Server
                             }
                             break;
                         case OpCode.DisConnect:
+                            break;
+                        case OpCode.Confirm:
+                            var imgConfig = new UdpConfigPackage()
+                            {
+                                SendEndPoint = $"{((IPEndPoint)s.LocalEndPoint).Address}|{11000}",
+                                ReceiveEndPoint = $"{((IPEndPoint)s.RemoteEndPoint).Address}|{12000}"
+                            };
+
+                            TcpPackage confirmPackage = new TcpPackage()
+                            {
+                                OpCode = OpCode.Confirm,
+                                MessageType = package.MessageType,
+                                LocalName = package.LocalName,
+                                RemoteName = package.RemoteName,
+                                Message = "image",
+                                Config = imgConfig
+                            };
+
+                            #region 测试数据
+                            //var testleData = new TcpPackage()
+                            //{
+                            //    OpCode = OpCode.Confirm,
+                            //    MessageType = MessageType.Text,
+                            //    LocalName = package.LocalName,
+                            //    RemoteName = package.RemoteName,
+                            //    Message = JsonConvert.SerializeObject(imgConfig),
+                            //    Config = imgConfig
+                            //};
+
+                            //var testString = testleData.ToString();
+                            #endregion
+
+                            var confirmMsg = confirmPackage.ToString();
+                            await s.SendAsync(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(confirmMsg)));
+
+                            if (package.RemoteName.Equals("All"))
+                            {
+                                confirmPackage.OpCode = OpCode.All;
+                            }
+                            else
+                            {
+                                confirmPackage.OpCode = OpCode.Single;
+                            }
+
+                            var cRemoteSession = _sessionContainer.GetSessions()
+                                                    .Where(x => x.SessionID != s.SessionID);
+                            var confirm = confirmPackage.ToString();
+                            foreach (var session in cRemoteSession)
+                            {
+                                await session.SendAsync(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(confirm)));
+                            }
                             break;
                         default:
                             throw new ArgumentException(message: "op code error");
@@ -249,7 +302,7 @@ namespace PMChat.Server
                 
                 var currentProcess = Process.GetCurrentProcess();
                 Console.WriteLine($"\n[{DateTime.Now}] RAM:{currentProcess.PrivateMemorySize64 / 1024 / 1024}/MB" + Environment.NewLine);
-                Thread.Sleep(3000);
+                Thread.Sleep(5000);
             }
         }
     }
