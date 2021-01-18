@@ -76,7 +76,7 @@ namespace PMChat.Server
                 .UsePackageHandler(async (s, p) =>
                 {
                     var package = TcpPackage.JsonToPackage(p.Text);
-                    Console.WriteLine($"\n{p.Text}\n");
+                    //Console.WriteLine($"\n{p.Text}\n");
 
                     switch (package.OpCode)
                     {
@@ -301,7 +301,7 @@ namespace PMChat.Server
                 //}
                 
                 var currentProcess = Process.GetCurrentProcess();
-                Console.WriteLine($"\n[{DateTime.Now}] RAM:{currentProcess.PrivateMemorySize64 / 1024 / 1024}/MB" + Environment.NewLine);
+                Console.WriteLine($"\n[{DateTime.Now}] Client:{_sessionContainer.GetSessionCount()} RAM:{currentProcess.PrivateMemorySize64 / 1024 / 1024}/MB" + Environment.NewLine);
                 Thread.Sleep(5000);
             }
         }

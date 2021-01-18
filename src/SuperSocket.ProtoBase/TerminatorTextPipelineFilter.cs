@@ -7,7 +7,7 @@ namespace SuperSocket.ProtoBase
     public class TerminatorTextPipelineFilter : TerminatorPipelineFilter<TextPackageInfo>
     {
         /// <summary>
-        /// 终止文本管道筛选器
+        /// 终端文本管道筛选器
         /// </summary>
         /// <param name="terminator"></param>
         public TerminatorTextPipelineFilter(ReadOnlyMemory<byte> terminator)

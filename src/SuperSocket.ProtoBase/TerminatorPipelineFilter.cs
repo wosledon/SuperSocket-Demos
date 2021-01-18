@@ -8,9 +8,9 @@ namespace SuperSocket.ProtoBase
     {
         private readonly ReadOnlyMemory<byte> _terminator;
         /// <summary>
-        /// 初始化终止管道筛选器
+        /// 初始化终端管道筛选器
         /// </summary>
-        /// <param name="terminator">终止信息</param>
+        /// <param name="terminator">终端信息</param>
         public TerminatorPipelineFilter(ReadOnlyMemory<byte> terminator)
         {
             _terminator = terminator;
