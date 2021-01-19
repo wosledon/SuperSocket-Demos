@@ -34,20 +34,16 @@ namespace JT808.Socket.Server
                         Port = 8888
                     });
                 })
-                //.UseSession<MySession>()
-                //.UseSessionHandler(async s =>
-                //{
-                    
-                //}, async (s, e) =>
-                //{
-                    
-                //})
+                .UseSession<MySession>()
+                .UseSessionHandler( s =>
+                {
+                    s["Identify"] = "0x001";
+                    return default;
+                })
                 .UsePackageHandler(async (s, p) =>
                 {
+                    #region 解包/应答/转发
                     Console.WriteLine(p.ToString());
-                    //var buff = p.Key.ToCharArray()
-                    //var jT808Package = new JT808Serializer().Deserialize(buff);
-                    //return jT808Package;
                     JT808Package jT808Package = JT808MsgId.位置信息汇报.Create("123456789012",
                         new JT808_0x0200
                         {
@@ -68,17 +64,17 @@ namespace JT808.Socket.Server
                     jT808Package.Header.ManualMsgNum = 1;
                     byte[] data = new JT808Serializer().Serialize(jT808Package);
                     await s.SendAsync(new ReadOnlyMemory<byte>(data));
+                    Console.WriteLine(s["Identify"].ToString());
+                    #endregion
                 })
                 .ConfigureErrorHandler((s, v) =>
                 {
                     Console.WriteLine($"\n[{DateTime.Now}] [TCP] Error信息:" + s.SessionID.ToString() + Environment.NewLine);
                     return default;
                 })
-                //.UseMiddleware<InProcSessionContainerMiddleware>()
-                //.UseInProcSessionContainer()
+                .UseMiddleware<InProcSessionContainerMiddleware>()
+                .UseInProcSessionContainer()
                 .BuildAsServer();
-
-            //_sessionContainer = host.GetSessionContainer();
 
             await host.StartAsync();
 
@@ -97,14 +93,6 @@ namespace JT808.Socket.Server
         {
             while (true)
             {
-                //if (sessions.Count != 0)
-                //{
-                //    foreach (var session in sessions)
-                //    {
-                //        await session.SendAsync(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes("Send Form Server" + "\r\n")));
-                //    }
-                //}
-
                 var currentProcess = Process.GetCurrentProcess();
                 Console.WriteLine($"\n[{DateTime.Now}] RAM:{currentProcess.PrivateMemorySize64 / 1024 / 1024}/MB" + Environment.NewLine);
                 Thread.Sleep(5000);

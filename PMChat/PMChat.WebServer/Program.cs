@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using PMChat.Models;
 using SuperSocket;
@@ -17,7 +18,7 @@ namespace PMChat.WebServer
     public class Program
     {
         private static List<ClientInfo> _clients = new List<ClientInfo>();
-        private static ISessionContainer _sessionContainer;
+        //private static ISessionContainer _sessionContainer;
         public static void Main(string[] args)
         {
             var host = CreateHostBuilder(args)
@@ -27,7 +28,7 @@ namespace PMChat.WebServer
                 })
                 .AsSuperSocketHostBuilder<TextPackageInfo, LinePipelineFilter>()
                 .UseSession<MySession>()
-                .UseHostedService<ChatService<TextPackageInfo>>()
+                //.UseHostedService<ChatService<TextPackageInfo>>()
                 .UseSessionHandler(async s =>
                 {
                     var data = new TcpPackage()
@@ -39,17 +40,16 @@ namespace PMChat.WebServer
                         Message = null,
                         Clients = _clients
                     };
+                    //FinalValues.SessionCount = _sessionContainer.GetSessionCount();
                     //var sessions = _sessionContainer.GetSessions();
                 })
                 .UsePackageHandler(async (s, p) =>
                 {
                     await s.SendAsync(Encoding.UTF8.GetBytes(p.Text + "\r\n"));
                 })
-                .UseMiddleware<InProcSessionContainerMiddleware>()
-                .UseInProcSessionContainer()
                 .Build();
 
-            host.StartAsync();
+            host.Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

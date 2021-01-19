@@ -1,26 +1,26 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using SuperSocket;
 using SuperSocket.Server;
 
 namespace PMChat.WebServer.Controllers
 {
     [ApiController]
-    [Route("api/sessions")]
-    public class SessionController: ControllerBase
+    [Route("api")]
+    public class SessionController : ControllerBase
     {
-        private readonly ISessionContainer _sessionContainer;
-        
-        public SessionController(ISessionContainer sessionContainer)
+        private ISessionContainer _session;
+
+        public SessionController(ISessionContainer session)
         {
-            _sessionContainer = sessionContainer;
+            _session = session;
         }
 
-        [HttpGet]
         public int Get()
         {
-            var res = _sessionContainer.GetSessionCount();
-
+            var res = FinalValues.SessionCount;
+            
             return res;
         }
     }

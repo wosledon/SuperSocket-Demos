@@ -173,7 +173,10 @@ namespace SuperSocket
         /// <param name="errorHandler">¥ÌŒÛ¥¶¿Ì</param>
         /// <returns></returns>
         // move to extensions
-        public static ISuperSocketHostBuilder<TReceivePackage> UsePackageHandler<TReceivePackage>(this ISuperSocketHostBuilder<TReceivePackage> hostBuilder, Func<IAppSession, TReceivePackage, ValueTask> packageHandler, Func<IAppSession, PackageHandlingException<TReceivePackage>, ValueTask<bool>> errorHandler = null)
+        public static ISuperSocketHostBuilder<TReceivePackage> UsePackageHandler<TReceivePackage>(
+            this ISuperSocketHostBuilder<TReceivePackage> hostBuilder, 
+            Func<IAppSession, TReceivePackage, ValueTask> packageHandler, 
+            Func<IAppSession, PackageHandlingException<TReceivePackage>, ValueTask<bool>> errorHandler = null)
         {
             return hostBuilder.ConfigureServices(
                 (hostCtx, services) =>

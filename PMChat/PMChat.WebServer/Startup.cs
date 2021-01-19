@@ -27,6 +27,8 @@ namespace PMChat.WebServer
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddSingleton<ISessionContainer, InProcSessionContainerMiddleware>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,7 +41,7 @@ namespace PMChat.WebServer
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            app.UseStaticFiles();
 
             app.UseEndpoints(endpoints =>
             {
